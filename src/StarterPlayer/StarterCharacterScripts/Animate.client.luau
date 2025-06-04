@@ -1,0 +1,1 @@
+--Disables defualt animation script

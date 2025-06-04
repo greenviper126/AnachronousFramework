@@ -1,0 +1,42 @@
+[package]
+name = "green/AnachronousFramework"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[server-dependencies]
+
+#main:
+profilestore = "lm-loleris/profilestore@1.0.2"
+cmdr = "evaera/cmdr@1.12.0"
+
+#optional:
+
+
+[dev-dependencies]
+
+#main:
+
+#optional:
+
+
+[dependencies]
+
+#main:
+red = "red-blox/red@2.3.0"
+ratelimit = "red-blox/ratelimit@1.0.1" #doesnt come with red for some reason
+
+react-roblox = "jsdotlua/react-roblox@17.2.1"
+topbarplus = "aspecky/topbarplus@2.9.3" #real version doesnt work right "1foreverhd/topbarplus@3.0.2"
+
+trove = "sleitnick/trove@1.5.0"
+dash = "dev-alastair/dash@1.1.2"
+promise = "evaera/promise@4.0.0"
+boattween = "boatbomber/boattween@1.0.1"
+
+ui-labs = "rocky28447/ui-labs@0.1.0"
+
+#optional:
+
+#stater = "denispionicul/stater@1.0.3"
+#smartbone-2 = "jakeywastaken/smartbone-2@0.4.2"

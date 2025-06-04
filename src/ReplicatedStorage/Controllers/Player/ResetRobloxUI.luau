@@ -1,0 +1,18 @@
+local StarterGui = game:GetService("StarterGui")
+
+local function setScreen(boolean)
+	--StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, boolean)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, boolean)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, boolean)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, boolean)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, boolean)
+
+	--StarterGui:SetCore("ResetButtonCallback", boolean)
+end
+
+while true do --roblox is dumb so imma just be safe here and loop
+	setScreen(false)
+	task.wait(0.5)
+end
+
+return {}
