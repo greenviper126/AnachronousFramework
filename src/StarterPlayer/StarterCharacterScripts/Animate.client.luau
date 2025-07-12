@@ -1,1 +1,1 @@
---Disables defualt animation script
+--Disables default animation script

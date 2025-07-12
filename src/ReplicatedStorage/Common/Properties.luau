@@ -2,7 +2,9 @@
 
 local Instance = {}
 
---reads an Instance and converts its properties to a table
+--[[
+	Reads an Instance and converts its properties to a table
+]]
 function Instance.InstanceToProperties(instance: Instance): { [string]: any }
 	local properties = Instance.Class[instance.ClassName]
 	if not properties then
@@ -22,12 +24,16 @@ function Instance.InstanceToProperties(instance: Instance): { [string]: any }
 	return tblProperties
 end
 
---reads attributes from an instance and converts it to a table
+--[[
+	Reads attributes from an instance and converts it to a table
+]]
 function Instance.AttributesToProperties(instance: Instance): { [string]: any }
 	return instance:GetAttributes()
 end
 
---applies a value to a property of the instance if one exists
+--[[
+	Applies a value to a property of the instance if one exists
+]]
 function Instance.ApplyPropertyValueToInstance(instance: Instance, property: string, value: any): (boolean, any)
 	return pcall(function()
 		local inst = instance :: any --fix type error
@@ -35,6 +41,9 @@ function Instance.ApplyPropertyValueToInstance(instance: Instance, property: str
 	end)
 end
 
+--[[
+	All types as recent as 2/20/2025
+]]
 Instance.Class = {
 	Accessory = {
 		"AccessoryType",

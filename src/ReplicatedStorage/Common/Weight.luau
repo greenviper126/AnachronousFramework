@@ -9,7 +9,9 @@ type self = {
 
 export type WeightScheduler = typeof(setmetatable({} :: self, WeightScheduler))
 
---weight system constructor
+--[[
+	Constructor
+]]
 function WeightScheduler.new()
 	local self = setmetatable({} :: self, WeightScheduler)
 	self._weights = {}
@@ -17,7 +19,9 @@ function WeightScheduler.new()
 	return self
 end
 
---add a weight to evaluate what is allowed to run
+--[[
+	Add a weight to evaluate what is allowed to run
+]]
 function WeightScheduler.Add(self: WeightScheduler, weight: number)
 	if table.find(self._weights, weight) then
 		return
@@ -25,7 +29,9 @@ function WeightScheduler.Add(self: WeightScheduler, weight: number)
 	table.insert(self._weights, weight)
 end
 
---remove a weight to evaluate what is allowed to run
+--[[
+	Remove a weight to evaluate what is allowed to run
+]]
 function WeightScheduler.Remove(self: WeightScheduler, weight: number)
 	local index = table.find(self._weights, weight)
 	if index then
@@ -33,7 +39,9 @@ function WeightScheduler.Remove(self: WeightScheduler, weight: number)
 	end
 end
 
---check if this weight is currently allowed to run
+--[[
+	Check if this weight is currently allowed to run
+]]
 function WeightScheduler.IsMax(self: WeightScheduler, weight: number): boolean
 	if #self._weights <= 1 then
 		return true
@@ -51,7 +59,9 @@ function WeightScheduler.IsMax(self: WeightScheduler, weight: number): boolean
 	return weight >= heaviestWeight
 end
 
---cleans up the constructed weight system
+--[[
+	Cleans up the constructed weight system
+]]
 function WeightScheduler.Cleanup(self: WeightScheduler)
 	self._weights = nil :: any
 	self = nil :: any

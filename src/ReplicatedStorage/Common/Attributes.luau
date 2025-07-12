@@ -2,14 +2,18 @@
 
 local Attributes = {}
 
---adds multiple attributes at one time with the same value
+--[[
+	Adds multiple attributes at one time with the same value
+]]
 function Attributes.Add(instance: Instance, value: any, ...: string)
 	for _, attribute in pairs({ ... }) do
 		instance:SetAttribute(attribute, value)
 	end
 end
 
---listens for given attributes on an instance, can be disconncetd
+--[[
+	listens for given attributes on an instance, can be disconnected
+]]
 function Attributes.Listen(instance: Instance, func: () -> (), ...: string): { Disconnect: (self: any) -> () }
 	local connections = {}
 
@@ -38,7 +42,9 @@ function Attributes.Listen(instance: Instance, func: () -> (), ...: string): { D
 	}
 end
 
---checks if atleast 1 given attributes exist on the given instance
+--[[
+	Checks if at least 1 given attributes exist on the given instance
+]]
 function Attributes.Exists(instance: Instance, ...: string): boolean
 	for _, attribute in pairs({ ... }) do
 		if instance:GetAttribute(attribute) ~= nil and true or false then
@@ -49,7 +55,9 @@ function Attributes.Exists(instance: Instance, ...: string): boolean
 	return false
 end
 
---checks if all given attributes exist on the given instance
+--[[
+	Checks if all given attributes exist on the given instance
+]]
 function Attributes.AllExists(instance: Instance, ...: string): boolean
 	for _, attribute in pairs({ ... }) do
 		if not (instance:GetAttribute(attribute) ~= nil and true or false) then
@@ -60,7 +68,9 @@ function Attributes.AllExists(instance: Instance, ...: string): boolean
 	return true
 end
 
---get all decendants that have atleast 1 given attributes
+--[[
+	Get all descendants that have at least 1 given attributes
+]]
 function Attributes.GetAny(folder: Instance, ...: string): { Instance }
 	local instances = {}
 
@@ -74,7 +84,9 @@ function Attributes.GetAny(folder: Instance, ...: string): { Instance }
 	return instances
 end
 
---get all decendants that have all given attributes
+--[[
+	Get all descendants that have all given attributes
+]]
 function Attributes.GetAll(folder: Instance, ...: string): { Instance }
 	local instances = {}
 
@@ -88,7 +100,9 @@ function Attributes.GetAll(folder: Instance, ...: string): { Instance }
 	return instances
 end
 
---clear all attributes on an instance
+--[[
+	Clear all attributes on an instance
+]]
 function Attributes.Clear(instance: Instance)
 	for attribute, _ in pairs(instance:GetAttributes()) do
 		instance:SetAttribute(attribute, nil)

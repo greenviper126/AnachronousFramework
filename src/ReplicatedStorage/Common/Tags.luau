@@ -4,6 +4,9 @@
 
 local CollectionService = game:GetService("CollectionService")
 
+--[[
+	Get instances with all specified tags
+]]
 local function getAll(...: string): { Instance }
 	local totalTags = select("#", ...)
 	assert(totalTags ~= 0, "getAll should receive at least one tag")
@@ -32,6 +35,9 @@ local function getAll(...: string): { Instance }
 	end
 end
 
+--[[
+	Get all instances with at least one specified tag
+]]
 local function getAny(...: string): { Instance }
 	local totalTags = select("#", ...)
 	assert(totalTags ~= 0, "getAny should receive at least one tag")
@@ -55,6 +61,11 @@ local function getAny(...: string): { Instance }
 	end
 end
 
+--[[
+	If the specified tags only contain one instance across them
+
+	Useful for special tags that are used in making specific cutscenes and events in game progression
+]]
 local function getUnique(...: string): Instance
 	local tagged = getAll(...)
 	local total = #tagged
@@ -72,6 +83,11 @@ local function getUnique(...: string): Instance
 	)
 end
 
+-- made by VIPER
+
+--[[
+	Basic setup for listening in on tags for OOP structures
+]]
 local function setObjectListner<T>(class: T & any): (() -> (), { [Instance]: T })
 	local instances = {}
 
@@ -104,6 +120,9 @@ local function setObjectListner<T>(class: T & any): (() -> (), { [Instance]: T }
 		instances
 end
 
+--[[
+	Small taging library with some custom extensions
+]]
 return {
 	GetUnique = getUnique,
 	GetAll = getAll,

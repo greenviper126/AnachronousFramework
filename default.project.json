@@ -10,16 +10,7 @@
         "StreamingEnabled": false
       },
 
-      "KeepOnRun": {
-        "$className": "Folder",
-        "$ignoreUnknownInstances": true,
-
-        "$properties": {
-          "Tags": {"Tags": ["KeepOnRun"]}
-        }
-      },
-
-      "Maps": {
+      "Map": {
         "$className": "Folder",
         "$ignoreUnknownInstances": true
       },
@@ -63,21 +54,6 @@
 
       "Packages": {
         "$path": "packages"
-      },
-
-      "Configs": {
-        "$className": "Folder",
-        "$ignoreUnknownInstances": true,
-
-        "GlobalLighting": {
-          "$className": "Folder",
-          "$ignoreUnknownInstances": true
-        },
-        
-        "GlobalSound": {
-          "$className": "Folder",
-          "$ignoreUnknownInstances": true
-        }
       }
     },
 
@@ -105,7 +81,7 @@
     "StarterGui": {
       "$className": "StarterGui",
       "$properties": {
-        "VirtualCursorMode": "Enabled"
+        "VirtualCursorMode": "Disabled"
       }
     },
 
@@ -124,7 +100,7 @@
         "CameraMaxZoomDistance": 0.5,
         "CameraMinZoomDistance": 0.5,
         "CameraMode": "LockFirstPerson",
-        "LoadCharacterAppearance": false,
+        "LoadCharacterAppearance": true,
         "UserEmotesEnabled": false,
         "CharacterJumpHeight": 0,
         "CharacterUseJumpPower": false,

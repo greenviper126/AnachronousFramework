@@ -39,6 +39,9 @@ local function LoadFromFile(file: Instance)
 	)
 end
 
+--[[
+	Initializes Modules depending on it running in server or on client
+]]
 return function()
 	if RunService:IsServer() then
 		local ServerStorage = game:GetService("ServerStorage")

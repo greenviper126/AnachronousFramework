@@ -12,7 +12,7 @@ currentSpawnFolder.Parent = workspace
 
 local SpawnManager = {}
 
---sets new spawns by there name
+--[[Sets new spawns by there name]]
 function SpawnManager.SetNewSpawns(name: string, ...: string)
 	local spawns = { name, ... }
 
@@ -27,7 +27,7 @@ function SpawnManager.SetNewSpawns(name: string, ...: string)
 	end
 end
 
---reloads the player with a load screen, you can add a function that runs after they are loaded in
+--[[Reloads the player with a load screen, you can add a function that runs after they are loaded in]]
 function SpawnManager.ReloadPlayer(player: Player, onSpawn: () -> ()?)
 	task.spawn(function()
 		player:SetAttribute("Loading", true)
@@ -43,7 +43,7 @@ function SpawnManager.ReloadPlayer(player: Player, onSpawn: () -> ()?)
 	end)
 end
 
---reloads all players in the game
+--[[Reloads all players in the game]]
 function SpawnManager.ReloadPlayers()
 	for _, player in pairs(Players:GetPlayers()) do
 		SpawnManager.ReloadPlayer(player)

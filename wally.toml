@@ -1,5 +1,5 @@
 [package]
-name = "green/AnachronousFramework"
+name = "green/anachronousframework"
 version = "0.1.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
@@ -7,8 +7,8 @@ realm = "shared"
 [server-dependencies]
 
 #main:
-profilestore = "lm-loleris/profilestore@1.0.2"
-cmdr = "evaera/cmdr@1.12.0"
+profilestore = "lm-loleris/profilestore@1.0.2" #data store
+cmdr = "evaera/cmdr@1.12.0" #command console
 
 #optional:
 
@@ -23,20 +23,24 @@ cmdr = "evaera/cmdr@1.12.0"
 [dependencies]
 
 #main:
-red = "red-blox/red@2.3.0"
+red = "red-blox/red@2.3.0" #secure signals and events
 ratelimit = "red-blox/ratelimit@1.0.1" #doesnt come with red for some reason
 
-react-roblox = "jsdotlua/react-roblox@17.2.1"
-topbarplus = "aspecky/topbarplus@2.9.3" #real version doesnt work right "1foreverhd/topbarplus@3.0.2"
+react-roblox = "jsdotlua/react-roblox@17.2.1" #UI library
 
 trove = "sleitnick/trove@1.5.0"
-dash = "dev-alastair/dash@1.1.2"
-promise = "evaera/promise@4.0.0"
-boattween = "boatbomber/boattween@1.0.1"
+dash = "dev-alastair/dash@1.1.2" #for tables / has intellisense
+promise = "evaera/promise@4.0.0" #for some bug prevention
 
-ui-labs = "rocky28447/ui-labs@0.1.0"
+input = "sleitnick/input@2.3.0" #user input
+shake = "sleitnick/shake@1.1.0" #camera shaking
+boattween = "boatbomber/boattween@1.0.1" #more tweening options
+
+stater = "denispionicul/stater@1.0.3" #for monster logic
+
 
 #optional:
 
-#stater = "denispionicul/stater@1.0.3"
+#ui-labs = "rocky28447/ui-labs@0.1.0"
 #smartbone-2 = "jakeywastaken/smartbone-2@0.4.2"
+#topbarplus = "aspecky/topbarplus@2.9.3" #real version doesnt work right "1foreverhd/topbarplus@3.0.2"

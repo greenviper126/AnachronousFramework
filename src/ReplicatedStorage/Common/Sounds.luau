@@ -68,7 +68,7 @@ if RunService:IsServer() then
 	soundGroupConfig.Parent = SoundService
 	_sounds = soundTable
 
-	local soundRequestLimit = RedEvents.Ratelimit(5, 5)
+	local soundRequestLimit = RedEvents.Ratelimit(5, 2)
 	RedEvents.Network.Client.SoundsRequest:SetCallback(function(_player)
 		if not soundRequestLimit(_player) then
 			warn("Sound Data was request to many times by, ", _player)

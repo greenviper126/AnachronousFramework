@@ -7,10 +7,10 @@ local function setScreen(boolean)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, boolean)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, boolean)
 
-	--StarterGui:SetCore("ResetButtonCallback", boolean)
+	StarterGui:SetCore("ResetButtonCallback", boolean)
 end
 
-while true do --roblox is dumb so imma just be safe here and loop
+while true do --roblox is dumb so im gonna just be safe here and loop
 	setScreen(false)
 	task.wait(0.5)
 end

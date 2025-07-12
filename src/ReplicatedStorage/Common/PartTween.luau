@@ -5,7 +5,9 @@ local RunService = game:GetService("RunService")
 
 local PartTween = {}
 
---move and rotate a part from its pivot point by tween
+--[[
+	Move and rotate a part from its pivot point by tween
+]]
 function PartTween.Move(part: BasePart, target: CFrame, info: TweenInfo?)
 	local value = Instance.new("CFrameValue")
 	value.Value = part:GetPivot()
@@ -26,8 +28,9 @@ function PartTween.Move(part: BasePart, target: CFrame, info: TweenInfo?)
 	return waitTime
 end
 
---this function will need to be updated
---move and rotate a part from its pivot point by lerp
+--[[
+	Move and rotate a part from its pivot point by lerp
+]]
 function PartTween.Lerp(part: BasePart, target: CFrame, alpha: number?)
 	local newAlpha = alpha or 1
 	local start = 0

@@ -54,7 +54,7 @@ function Modal.IsOn(self: Modal): boolean
 	return self._modal.Visible
 end
 
---checks for any modals state thats true
+--checks for any modal state thats true
 function Modal.AnyIsOn(): boolean
 	local isOn = false
 

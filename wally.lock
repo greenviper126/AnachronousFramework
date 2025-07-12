@@ -3,14 +3,14 @@
 registry = "test"
 
 [[package]]
-name = "aspecky/topbarplus"
-version = "2.9.3"
-dependencies = []
-
-[[package]]
 name = "boatbomber/boattween"
 version = "1.0.1"
 dependencies = []
+
+[[package]]
+name = "denispionicul/stater"
+version = "1.0.3"
+dependencies = [["Signal", "sleitnick/signal@2.0.3"], ["Trove", "sleitnick/trove@1.5.0"]]
 
 [[package]]
 name = "dev-alastair/dash"
@@ -28,9 +28,9 @@ version = "4.0.0"
 dependencies = []
 
 [[package]]
-name = "green/hg-framework"
+name = "green/anachronousframework"
 version = "0.1.0"
-dependencies = [["boattween", "boatbomber/boattween@1.0.1"], ["dash", "dev-alastair/dash@1.1.2"], ["promise", "evaera/promise@4.0.0"], ["ratelimit", "red-blox/ratelimit@1.0.1"], ["react-roblox", "jsdotlua/react-roblox@17.2.1"], ["red", "red-blox/red@2.3.2"], ["topbarplus", "aspecky/topbarplus@2.9.3"], ["trove", "sleitnick/trove@1.5.0"], ["ui-labs", "rocky28447/ui-labs@0.1.0"], ["cmdr", "evaera/cmdr@1.12.0"], ["profilestore", "lm-loleris/profilestore@1.0.2"]]
+dependencies = [["boattween", "boatbomber/boattween@1.0.1"], ["dash", "dev-alastair/dash@1.1.2"], ["input", "sleitnick/input@2.3.0"], ["promise", "evaera/promise@4.0.0"], ["ratelimit", "red-blox/ratelimit@1.0.1"], ["react-roblox", "jsdotlua/react-roblox@17.2.1"], ["red", "red-blox/red@2.3.2"], ["shake", "sleitnick/shake@1.1.0"], ["stater", "denispionicul/stater@1.0.3"], ["trove", "sleitnick/trove@1.5.0"], ["cmdr", "evaera/cmdr@1.12.0"], ["profilestore", "lm-loleris/profilestore@1.0.2"]]
 
 [[package]]
 name = "jsdotlua/boolean"
@@ -153,8 +153,18 @@ version = "1.1.0"
 dependencies = []
 
 [[package]]
-name = "rocky28447/ui-labs"
-version = "0.1.0"
+name = "sleitnick/input"
+version = "2.3.0"
+dependencies = [["Signal", "sleitnick/signal@2.0.3"], ["Trove", "sleitnick/trove@1.5.0"]]
+
+[[package]]
+name = "sleitnick/shake"
+version = "1.1.0"
+dependencies = []
+
+[[package]]
+name = "sleitnick/signal"
+version = "2.0.3"
 dependencies = []
 
 [[package]]
