@@ -6,12 +6,12 @@
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local DeviceInfo = require(ReplicatedStorage.ClientCommon.DeviceInfo)
-local Sounds = require(ReplicatedStorage.Common.Sounds)
+--local DeviceInfo = require(ReplicatedStorage.ClientCommon.DeviceInfo)
+--local Sounds = require(ReplicatedStorage.Common.Sounds)
 
-local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+--local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 -- local tasks = Instance.new("ScreenGui")
 -- tasks.Name = "Tasks"

@@ -1,8 +1,8 @@
 --!strict
 
 local BadgeService = game:GetService("BadgeService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Promise = require(ReplicatedStorage.Packages.promise)
 
@@ -19,7 +19,9 @@ Badge.Badges = {
 --[[
 	Attempts to give the given badge to the given player
 
-	there is an optional parameter for retry's
+	@param player Player - The player to give the badge too
+	@param badgeId number - The id of the badge
+	@param attempts number - Amount of times to attempt the badge if failed (defaults to 5)
 ]]
 function Badge.Give(player: Player, badgeId: number, attempts: number?)
 	local function giveBadge()
@@ -39,6 +41,9 @@ end
 
 --[[
 	Similar to give function but gives badges to all current players
+	
+	@param badgeId number - The id of the badge
+	@param attempts number - Amount of times to attempt the badge if failed (defaults to 5)
 ]]
 function Badge.GiveAll(badgeId: number, attempts: number?)
 	for player in Players:GetPlayers() do

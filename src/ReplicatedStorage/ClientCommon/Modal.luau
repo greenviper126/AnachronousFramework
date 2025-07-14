@@ -11,6 +11,9 @@ ModalGUI.Name = "MainModal"
 
 ModalGUI.Parent = player.PlayerGui
 
+--[[
+	New Modal UI
+]]
 local function newModal(name: string?): TextButton
 	local modal = Instance.new("TextButton")
 	modal.BackgroundTransparency = 0.99
@@ -25,6 +28,11 @@ local function newModal(name: string?): TextButton
 	return modal
 end
 
+--[[
+	This is for Locking and Unlocking the Mouse.
+	
+	Mostly for UI Purposes.
+]]
 local Modal = {}
 Modal.__index = Modal
 
@@ -35,7 +43,11 @@ type self = {
 
 export type Modal = typeof(setmetatable({} :: self, Modal))
 
---modal system constructor
+--[[
+	Constructor
+
+	@return self - the new object
+]]
 function Modal.new(name: string)
 	local self = setmetatable({} :: self, Modal)
 	self.name = name
@@ -44,17 +56,32 @@ function Modal.new(name: string)
 	return self
 end
 
---enables modal
+--[[
+	Enables the Modal
+
+	@param self Modal - object
+	@param enable boolean - State to set the Modal
+]]
 function Modal.Enable(self: Modal, enable: boolean)
 	self._modal.Visible = enable
 end
 
---checks this modals state
+--[[
+	Checks this Modals State
+
+	@param self Modal - object
+
+	@return boolean - Current State of the Modal
+]]
 function Modal.IsOn(self: Modal): boolean
 	return self._modal.Visible
 end
 
---checks for any modal state thats true
+--[[
+	Checks if any of the Modals are on outside of this object and inside
+
+	@return boolean - Are any currently active
+]]
 function Modal.AnyIsOn(): boolean
 	local isOn = false
 
@@ -72,7 +99,11 @@ function Modal.AnyIsOn(): boolean
 	return isOn
 end
 
---cleans up the constructed modal system
+--[[
+	Cleans up the Modal object
+
+	@param self Modal - object
+]]
 function Modal.Cleanup(self: Modal)
 	self._modal:Destroy()
 	self = nil :: any

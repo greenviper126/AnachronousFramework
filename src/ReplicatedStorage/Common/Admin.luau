@@ -11,6 +11,10 @@ Admin.IDs = {
 
 --[[
 	Checks if the provided ID is from an admin
+
+	@param id number - id of a roblox player
+
+	@return boolean - was that id an admin?
 ]]
 function Admin.IsAdmin(id: number): boolean
 	return table.find(Admin.IDs, id) ~= nil
@@ -18,8 +22,10 @@ end
 
 --[[
 	Checks if local player is an admin
+	
+	@note only works locally
 
-	only works locally
+	@return boolean - is local player admin?
 ]]
 function Admin.IsLocalAdmin(): boolean
 	local player = Players.LocalPlayer

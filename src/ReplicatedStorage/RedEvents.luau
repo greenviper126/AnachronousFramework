@@ -6,10 +6,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Red = require(ReplicatedStorage.Packages.red)
-local Signal = require(ReplicatedStorage.Packages._Index["red-blox_signal@2.0.2"].signal)
 local Guard = require(ReplicatedStorage.Packages._Index["red-blox_guard@1.0.1"].guard)
 local Ratelimit = require(ReplicatedStorage.Packages.ratelimit)
+local Red = require(ReplicatedStorage.Packages.red)
+local Signal = require(ReplicatedStorage.Packages._Index["red-blox_signal@2.0.2"].signal)
 
 --[[network connections]]
 ----------------------------------------------------------------------------------------------------
@@ -36,33 +36,32 @@ local fromNetworkClient = {
 	SoundsRequest = Red.Function("SoundsRequest", function() end, function(Table)
 		return Guard.Map(Guard.String, Guard.Any)(Table)
 	end),
-	LinkAttempt = Red.Function("LinkAttempt", function(linkModel)
-		return Guard.Instance(linkModel)
-	end, function(success)
-		return Guard.Boolean(success)
-	end),
 }
 
 --[[signal connections]]
 ----------------------------------------------------------------------------------------------------
 
 --server side
-local fromSignalServer = {
-	LoadMap = Signal(),
-	NewItem = Signal(),
-}
+local fromSignalServer = {}
 
 --client side
-local fromSignalClient = {
-	DisablePlayerControls = Signal(),
-	Link = Signal(),
-}
+local fromSignalClient = {}
 
-return {
+--[[
+	Anything that needs an event or signal should go through here for security.
+
+	All Events will be created within this Module.
+
+	Signals should be made using NewSignal if it will stay within the module using it.
+	If that is not the case it should be created in RedEvents Module.
+]]
+local RedSignalNetwork = {
+	-- client to server and server to client communications
 	Network = {
 		Server = fromNetworkServer,
 		Client = fromNetworkClient,
 	},
+	-- client to client and server to server communications
 	Signal = {
 		Server = fromSignalServer,
 		Client = fromSignalClient,
@@ -70,3 +69,5 @@ return {
 	Ratelimit = Ratelimit,
 	NewSignal = Signal,
 }
+
+return RedSignalNetwork

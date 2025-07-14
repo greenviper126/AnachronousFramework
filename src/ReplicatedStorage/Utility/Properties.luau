@@ -1,9 +1,16 @@
 --!strict
 
+--[[
+	For setting and fetching Instance properties by table and attributes
+]]
 local Instance = {}
 
 --[[
 	Reads an Instance and converts its properties to a table
+
+	@param instance Instance - The instance to pull its properties from
+
+	@return { [string]: any } - Table of all pulled properties
 ]]
 function Instance.InstanceToProperties(instance: Instance): { [string]: any }
 	local properties = Instance.Class[instance.ClassName]
@@ -26,6 +33,10 @@ end
 
 --[[
 	Reads attributes from an instance and converts it to a table
+	
+	@param instance Instance - The instance to pull its attributes from
+
+	@return { [string]: any } - Table of all pulled properties
 ]]
 function Instance.AttributesToProperties(instance: Instance): { [string]: any }
 	return instance:GetAttributes()
@@ -33,6 +44,13 @@ end
 
 --[[
 	Applies a value to a property of the instance if one exists
+	
+	@param instance Instance - The instance to pull its properties from
+	@param property string - The name of the property you want to change
+	@param value any - The value you want to change the property too
+
+	@return boolean - was applying successful
+	@return any - error message
 ]]
 function Instance.ApplyPropertyValueToInstance(instance: Instance, property: string, value: any): (boolean, any)
 	return pcall(function()

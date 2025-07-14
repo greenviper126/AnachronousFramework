@@ -6,6 +6,10 @@ local CollectionService = game:GetService("CollectionService")
 
 --[[
 	Get instances with all specified tags
+
+	@param ... string - List of strings to find tag Instances of
+
+	@return {Instance} - All the instances found
 ]]
 local function getAll(...: string): { Instance }
 	local totalTags = select("#", ...)
@@ -36,7 +40,11 @@ local function getAll(...: string): { Instance }
 end
 
 --[[
-	Get all instances with at least one specified tag
+	Get instances with at least one specified tag
+	
+	@param ... string - List of strings to find tag Instances of
+
+	@return {Instance} - All the instances found
 ]]
 local function getAny(...: string): { Instance }
 	local totalTags = select("#", ...)
@@ -65,6 +73,10 @@ end
 	If the specified tags only contain one instance across them
 
 	Useful for special tags that are used in making specific cutscenes and events in game progression
+
+	@param ... string - List of strings to find tag Instances of
+
+	@return Instance - If only 1 exists it will return it
 ]]
 local function getUnique(...: string): Instance
 	local tagged = getAll(...)
@@ -87,8 +99,13 @@ end
 
 --[[
 	Basic setup for listening in on tags for OOP structures
+
+	@param class T&any - A metatable with some certain requirements
+
+	@return () -> () - Cleanup function
+	@return () -> ({ [Instance]: T }) - Instances that have been attached to this class
 ]]
-local function setObjectListner<T>(class: T & any): (() -> (), { [Instance]: T })
+local function setObjectListner<T>(class: T & any): (() -> (), () -> { [Instance]: T })
 	local instances = {}
 
 	local instanceAddedSignal = CollectionService:GetInstanceAddedSignal(class.TAG_NAME)
@@ -116,12 +133,13 @@ local function setObjectListner<T>(class: T & any): (() -> (), { [Instance]: T }
 		if listiner2 then
 			listiner2:Disconnect()
 		end
-	end,
-		instances
+	end, function()
+		return instances
+	end
 end
 
 --[[
-	Small taging library with some custom extensions
+	Taging library with some custom extensions for OOP
 ]]
 return {
 	GetUnique = getUnique,

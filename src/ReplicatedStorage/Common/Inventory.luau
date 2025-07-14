@@ -1,15 +1,15 @@
 --!strict
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
-local Properties = require(ReplicatedStorage.Common.Properties)
+local Utility = require(ReplicatedStorage.Utility)
 
 local inventoryConfig: Configuration = nil
 
 function currentItems(): { string: any }
-	return Properties.AttributesToProperties(inventoryConfig)
+	return Utility.Properties.AttributesToProperties(inventoryConfig)
 end
 
 function hasItem(name: string): boolean

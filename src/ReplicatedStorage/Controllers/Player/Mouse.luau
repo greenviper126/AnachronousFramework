@@ -3,8 +3,8 @@
 local DEFAULT_MOUSE_IMAGE = 9129033463 --white circle
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Input = require(ReplicatedStorage.Packages.input)
 

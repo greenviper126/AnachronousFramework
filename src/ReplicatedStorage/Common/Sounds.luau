@@ -1,14 +1,19 @@
 --!strict
 
 export type SoundTable = { Sound: { [string]: any }, Children: { [string]: { [string]: any } } }
+export type VarianceTable = {
+	PlaybackSpeed: number,
+	Volume: number,
+}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)
-local Properties = require(ReplicatedStorage.Common.Properties)
+local Utility = require(ReplicatedStorage.Utility)
 
+local Random = Random.new()
 local UnParentedSounds: Folder = nil
 
 local _soundGroups: { [string]: SoundGroup } = {}
@@ -28,7 +33,7 @@ if RunService:IsServer() then
 		local children = {}
 
 		for _, child in pairs(sound:GetChildren()) do
-			children[child.ClassName] = Properties.InstanceToProperties(child)
+			children[child.ClassName] = Utility.Properties.InstanceToProperties(child)
 		end
 
 		return children
@@ -51,7 +56,7 @@ if RunService:IsServer() then
 
 			local success, errorMessage = pcall(function()
 				soundTable[sound.Name] = { --create sound and its children
-					Sound = Properties.InstanceToProperties(sound),
+					Sound = Utility.Properties.InstanceToProperties(sound),
 					Children = getSoundChildren(sound),
 				}
 
@@ -68,7 +73,7 @@ if RunService:IsServer() then
 	soundGroupConfig.Parent = SoundService
 	_sounds = soundTable
 
-	local soundRequestLimit = RedEvents.Ratelimit(5, 2)
+	local soundRequestLimit = RedEvents.Ratelimit(5, 5)
 	RedEvents.Network.Client.SoundsRequest:SetCallback(function(_player)
 		if not soundRequestLimit(_player) then
 			warn("Sound Data was request to many times by, ", _player)
@@ -101,16 +106,44 @@ elseif RunService:IsClient() then
 	end
 end
 
+----------------------------------------------------------------------------------------------------------------
+
+--[[
+	Custom Sound Player
+
+	Keeps all sound data in a table and loads it when called
+	All sounds should be requested from this system on server and client
+]]
 local Sounds = {}
 
+--[[
+	Returns name of sound group if it exists
+
+	@param name string - Name of the SoundGroup
+
+	@return SoundGroup? - The SoundGroup you were looking for
+]]
 function Sounds.FindSoundGroup(name: string): SoundGroup?
 	return _soundGroups[name]
 end
 
+--[[
+	Returns all sound groups that exist
+
+	@return { [string]: SoundGroup } - A list of all SoundGroups
+]]
 function Sounds.GetSoundGroups(): { [string]: SoundGroup }
 	return _soundGroups
 end
 
+--[[
+	Converts SoundTable Data into a real sound Instance
+	Can also remember child modifiers for manipulating sound
+
+	@param soundData SoundTable - Table storing all the data to make a sound Instance
+
+	@return Sound - The sound Instance you requested to be made from a SoundTable
+]]
 function Sounds.CreateSound(soundData: SoundTable): Sound
 	local newSound = Instance.new("Sound")
 
@@ -120,7 +153,7 @@ function Sounds.CreateSound(soundData: SoundTable): Sound
 	end
 
 	for property, value in pairs(soundData.Sound) do --create new sound
-		Properties.ApplyPropertyValueToInstance(newSound, property, value)
+		Utility.Properties.ApplyPropertyValueToInstance(newSound, property, value)
 	end
 
 	local realSoundGroup = Sounds.FindSoundGroup(soundData.Sound.SoundGroup)
@@ -131,7 +164,7 @@ function Sounds.CreateSound(soundData: SoundTable): Sound
 			local newClass = Instance.new(class)
 
 			for property, value in pairs(properties) do --create new child class
-				Properties.ApplyPropertyValueToInstance(newClass, property, value)
+				Utility.Properties.ApplyPropertyValueToInstance(newClass, property, value)
 			end
 
 			newClass.Parent = newSound
@@ -141,7 +174,16 @@ function Sounds.CreateSound(soundData: SoundTable): Sound
 	return newSound
 end
 
-function Sounds.FindSoundByName(name: string, parent: Instance?): Sound?
+--[[
+	Searches through all the saved sounds and makes an Instance of it
+
+	@param name string - The name of the sound you want to play
+	@param variance VarianceTable? - A table for varying the sound to make it less repetitive
+	@param parent Instance? - The instance you want to parent the sound too
+
+	@return Sound? - Returns a Sound if it exists
+]]
+function Sounds.FindSoundByName(name: string, variance: VarianceTable?, parent: Instance?): Sound?
 	local soundData = _sounds[name]
 	if not soundData then
 		return
@@ -150,18 +192,50 @@ function Sounds.FindSoundByName(name: string, parent: Instance?): Sound?
 	local newSound = Sounds.CreateSound(soundData)
 	if newSound then
 		newSound.Parent = parent and parent or UnParentedSounds
+
+		if variance then
+			newSound.PlaybackSpeed = newSound.PlaybackSpeed * (variance.PlaybackSpeed or 1)
+			newSound.Volume = newSound.Volume * (variance.Volume or 1)
+		end
+	else
+		warn("Could not find sound named " .. name)
 	end
 
 	return newSound
 end
 
-function Sounds.PlaySoundByName(name: string, parent: Instance?)
-	local sound = Sounds.FindSoundByName(name, parent)
+--[[
+	Will automatically play the sound and clean it up when called
+
+	@param name string - The name of the sound you want to play
+	@param variance VarianceTable? - A table for varying the sound to make it less repetitive
+	@param parent Instance? - The instance you want to parent the sound too
+]]
+function Sounds.PlaySoundByName(name: string, variance: VarianceTable?, parent: Instance?)
+	local sound = Sounds.FindSoundByName(name, variance, parent)
 	if not sound then
 		return
 	end
 
-	sound:Play()
+	sound.PlayOnRemove = true
+	sound:Destroy()
+end
+
+--[[
+	Creates random variance values for sound playback
+	
+	@param minSpeed number? - Minimum playback speed multiplier (default: 0.9)
+	@param maxSpeed number? - Maximum playback speed multiplier (default: 1.1)
+	@param minVolume number? - Minimum volume multiplier (default: 0.9)
+	@param maxVolume number? - Maximum volume multiplier (default: 1.1)
+
+	@return VarianceTable - Random options decided from the givin params
+]]
+function Sounds.Variance(minSpeed: number?, maxSpeed: number?, minVolume: number?, maxVolume: number?): VarianceTable
+	return {
+		PlaybackSpeed = Random:NextNumber(minSpeed or 0.9, maxSpeed or 1.1),
+		Volume = Random:NextNumber(minVolume or 0.9, maxVolume or 1.1),
+	}
 end
 
 return Sounds

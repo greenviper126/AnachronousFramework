@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 
 --starts modules from selected folder
 local function LoadFromFile(file: Instance)
-	local files: { any } = {}
+	local _files: { any } = {}
 	local fileRead = ""
 
 	local function addModules(currentFile: Instance)
@@ -15,7 +15,7 @@ local function LoadFromFile(file: Instance)
 				fileRead = fileRead .. "\t" .. v.Name .. "\n"
 
 				task.spawn(function()
-					table.insert(files, require(v) :: any)
+					table.insert(_files, require(v) :: any)
 				end)
 			end
 		end
@@ -23,17 +23,13 @@ local function LoadFromFile(file: Instance)
 
 	addModules(file)
 
-	--may not need this, lets modules know when other modules are ready
-	for _, v in pairs(files) do
-		pcall(function()
-			v.OnStart()
-		end)
-	end
+	local isServer = RunService:IsServer()
 
 	print(
 		string.format(
-			"\n[[------------loading %s file------------]]\n %s ------------------------------------\n\n",
+			"\n[[------------loading %s file on %s------------]]\n %s ------------------------------------\n\n",
 			file.Name,
+			isServer and "Server" or "Client",
 			fileRead
 		)
 	)
@@ -41,6 +37,8 @@ end
 
 --[[
 	Initializes Modules depending on it running in server or on client
+
+	@return () -> () - Will setup modules on server or client depending on where this is called
 ]]
 return function()
 	if RunService:IsServer() then
