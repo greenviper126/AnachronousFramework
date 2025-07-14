@@ -27,7 +27,7 @@ local function LoadFromFile(file: Instance)
 
 	print(
 		string.format(
-			"\n[[------------loading %s file on %s------------]]\n %s ------------------------------------\n\n",
+			"\n[[------------loading %s file on %s------------]]\n %s --------------------------------------------------------\n\n",
 			file.Name,
 			isServer and "Server" or "Client",
 			fileRead
