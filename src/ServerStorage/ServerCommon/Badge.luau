@@ -29,7 +29,7 @@ function Badge.Give(player: Player, badgeId: number, attempts: number?)
 			local success = BadgeService:AwardBadge(player.UserId, badgeId)
 
 			if not success then
-				reject("Could not award Badge to " .. player.Name)
+				reject("Could not award Badge with Id" .. badgeId .. " to Player: " .. player.Name)
 			else
 				resolve()
 			end

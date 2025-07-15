@@ -54,6 +54,11 @@
 
       "Packages": {
         "$path": "packages"
+      },
+
+      "PlayerFlashlight": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true
       }
     },
 

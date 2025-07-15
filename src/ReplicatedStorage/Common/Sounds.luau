@@ -21,7 +21,7 @@ local _sounds: { [string]: SoundTable } = nil
 
 if RunService:IsServer() then
 	local ServerStorage = game:GetService("ServerStorage")
-	local soundFolder = ServerStorage.Sounds
+	local soundFolder = ServerStorage:FindFirstChild("Sounds")
 
 	UnParentedSounds = Instance.new("Folder")
 	UnParentedSounds.Name = "UnParentedSounds"
@@ -185,7 +185,13 @@ end
 ]]
 function Sounds.FindSoundByName(name: string, variance: VarianceTable?, parent: Instance?): Sound?
 	local soundData = _sounds[name]
+
+	if not _sounds then
+		warn("Sound data is currently nil, cannot pull sound named " .. name)
+		return
+	end
 	if not soundData then
+		warn("Could not find sound named " .. name)
 		return
 	end
 
@@ -198,7 +204,7 @@ function Sounds.FindSoundByName(name: string, variance: VarianceTable?, parent: 
 			newSound.Volume = newSound.Volume * (variance.Volume or 1)
 		end
 	else
-		warn("Could not find sound named " .. name)
+		warn("Could not create sound named " .. name)
 	end
 
 	return newSound
@@ -224,17 +230,17 @@ end
 --[[
 	Creates random variance values for sound playback
 	
-	@param minSpeed number? - Minimum playback speed multiplier (default: 0.9)
-	@param maxSpeed number? - Maximum playback speed multiplier (default: 1.1)
-	@param minVolume number? - Minimum volume multiplier (default: 0.9)
-	@param maxVolume number? - Maximum volume multiplier (default: 1.1)
+	@param minSpeed number? - Minimum playback speed multiplier (default: 0.95)
+	@param maxSpeed number? - Maximum playback speed multiplier (default: 1.05)
+	@param minVolume number? - Minimum volume multiplier (default: 0.95)
+	@param maxVolume number? - Maximum volume multiplier (default: 1.05)
 
 	@return VarianceTable - Random options decided from the givin params
 ]]
 function Sounds.Variance(minSpeed: number?, maxSpeed: number?, minVolume: number?, maxVolume: number?): VarianceTable
 	return {
-		PlaybackSpeed = Random:NextNumber(minSpeed or 0.9, maxSpeed or 1.1),
-		Volume = Random:NextNumber(minVolume or 0.9, maxVolume or 1.1),
+		PlaybackSpeed = Random:NextNumber(minSpeed or 0.95, maxSpeed or 1.05),
+		Volume = Random:NextNumber(minVolume or 0.95, maxVolume or 1.05),
 	}
 end
 

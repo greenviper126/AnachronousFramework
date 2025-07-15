@@ -8,6 +8,10 @@ local GlobalInfo = {}
 
 GlobalInfo.MaxPlayers = 6 --int
 
+GlobalInfo.Flashlight = {
+	LIGHT_SWITCH_SPEED = 1, -- should be greater than 0.7
+}
+
 GlobalInfo.Spawn = {
 	SPAWN_TIME = 6, --float
 }

@@ -7,7 +7,8 @@ local function setScreen(boolean)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, boolean)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, boolean)
 
-	StarterGui:SetCore("ResetButtonCallback", boolean)
+	--this causes an error sometimes and idk why yet
+	--StarterGui:SetCore("ResetButtonCallback", boolean)
 end
 
 while true do --roblox is dumb so im gonna just be safe here and loop

@@ -21,6 +21,8 @@ local fromNetworkServer = {
 	end),
 
 	--functions
+
+	--unreliable
 }
 
 --fired from client
@@ -36,6 +38,14 @@ local fromNetworkClient = {
 	SoundsRequest = Red.Function("SoundsRequest", function() end, function(Table)
 		return Guard.Map(Guard.String, Guard.Any)(Table)
 	end),
+
+	--unreliable
+	BodyCFrame = Red.SharedEvent({
+		Name = "BodyCFrame",
+		Unreliable = true,
+	}, function(neck, waist)
+		return Guard.CFrame(neck), Guard.CFrame(waist)
+	end),
 }
 
 --[[signal connections]]
@@ -45,7 +55,9 @@ local fromNetworkClient = {
 local fromSignalServer = {}
 
 --client side
-local fromSignalClient = {}
+local fromSignalClient = {
+	Flashlight = Signal(),
+}
 
 --[[
 	Anything that needs an event or signal should go through here for security.
