@@ -9,7 +9,7 @@ local Modal = require(ReplicatedStorage.ClientCommon.Modal)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
---seems like cmdr doesnt have an easy way to see if the UI is visible
+--seems like cmdr doesn't have an easy way to see if the UI is visible
 local cmdrUI = player.PlayerGui:WaitForChild("Cmdr")
 local mainFrame = cmdrUI:WaitForChild("Frame") :: ScrollingFrame
 

@@ -23,6 +23,12 @@ local fromNetworkServer = {
 	--functions
 
 	--unreliable
+	ServerBodyCFrame = Red.SharedEvent({
+		Name = "ServerBodyCFrame",
+		Unreliable = true,
+	}, function(player, neck, waist)
+		return Guard.Any(player), Guard.CFrame(neck), Guard.CFrame(waist)
+	end),
 }
 
 --fired from client
