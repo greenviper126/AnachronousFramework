@@ -6,33 +6,38 @@
 
 local GlobalInfo = {}
 
-GlobalInfo.MaxPlayers = 6 --int
+GlobalInfo.MAX_PLAYERS = 6 --int
 
-GlobalInfo.Flashlight = {
+GlobalInfo.FLASHLIGHT = {
 	LIGHT_SWITCH_SPEED = 1, -- should be greater than 0.7
 }
 
-GlobalInfo.Spawn = {
+GlobalInfo.MOVEMENT = {
+	SPEED = { --character speed
+		WALKING = 8,
+		RUNNING = 16,
+		CROUCHING = 6,
+	},
+	TRACKING = { --body to camera tracking
+		LOOK_LERP_SPEED = 0.2, --float
+		TURN_STRENGTH = 70, --float
+	},
+	STAMINA = { --stamina bar
+		MAX_STAMINA = 100, --int
+		STAMINA_REGEN = 0.1, --float
+		STAMINA_DRAIN = 0.2, --float
+	},
+}
+
+GlobalInfo.SPAWN = {
 	SPAWN_TIME = 6, --float
 }
 
-GlobalInfo.Movement = {
-	SPEED = { --float, stud
-		Walking = 8,
-		Running = 16,
-		Crouching = 6,
-	},
-
-	MAX_STAMINA = 100, --int
-	STAMINA_REGEN = 0.1, --float
-	STAMINA_DRAIN = 0.2, --float
-}
-
-GlobalInfo.InfoText = {
+GlobalInfo.INFO_TEXT = {
 	CHAR_PER_SEC = 17, --int
 }
 
-GlobalInfo.Viewer = {
+GlobalInfo.VIEWER = {
 	DISPLAY_DIST = 2, --float, stud
 	ROTATE_SPEED = 1.5, --float, deg
 }

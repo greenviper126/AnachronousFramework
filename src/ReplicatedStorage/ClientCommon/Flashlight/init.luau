@@ -178,7 +178,7 @@ function Light.ConnectKey(self: Light)
 			return Enum.ContextActionResult.Pass
 		end
 
-		if time() - self.prevClick < GlobalInfo.Flashlight.LIGHT_SWITCH_SPEED then
+		if time() - self.prevClick < GlobalInfo.FLASHLIGHT.LIGHT_SWITCH_SPEED then
 			return Enum.ContextActionResult.Pass
 		end
 		self.prevClick = time()

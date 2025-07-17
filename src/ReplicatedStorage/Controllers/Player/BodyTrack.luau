@@ -6,18 +6,20 @@ local RunService = game:GetService("RunService")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
+local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 local neckC0 = CFrame.new(0, 0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 local waistC0 = CFrame.new(0, 0.2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 
-RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function(delta: number)
 	if player.Character == nil then
 		return
 	end
 
 	local camera = workspace.CurrentCamera
-	local root = player.Character:FindFirstChild("HumanoidRootPart")
+	local root = player.Character:FindFirstChild("HumanoidRootPart") :: Part
 
 	if not root or not camera then
 		return
@@ -33,24 +35,30 @@ RunService.RenderStepped:Connect(function()
 		return
 	end
 
-	local theta = math.asin(camera.CFrame.LookVector.y) -- for looking up and down
+	-- for looking up and down
+	local theta = math.asin(camera.CFrame.LookVector.y)
 
-	local camera_angle = math.atan2(camera.CFrame.LookVector.X, camera.CFrame.LookVector.Z)
-	local body_angle = math.atan2(root.CFrame.LookVector.X, root.CFrame.LookVector.Z)
-	local theta2 = (camera_angle - body_angle) % (2 * math.pi) -- for looking left and right
+	-- this is for rotating the waist
+	local rotationVelocity = -math.sin(root.AssemblyAngularVelocity.Unit.Y) * GlobalInfo.MOVEMENT.TRACKING.TURN_STRENGTH
+	local currentWaistRotation = waistC0.Rotation.Y + (rotationVelocity - waistC0.Rotation.Y) * delta
+	if currentWaistRotation ~= currentWaistRotation then --can be NAN on start
+		currentWaistRotation = 0
+	end
 
-	if theta2 > math.pi / 2 and theta2 < math.pi * 1.5 then
-		theta2 = math.pi - theta2
+	--to help prevent snapping on waist
+	if math.abs(rotationVelocity) < 0.01 then
+		currentWaistRotation = currentWaistRotation * 0.95
 	end
 
 	-- this will set it locally for this player
 	local neck, waist = head.Neck, upperTorso.Waist
-	neck.C0 = neckC0 * CFrame.Angles(theta * 0.5, -theta2, 0)
-	waist.C0 = waistC0 * CFrame.Angles(theta * 0.5, 0, 0)
+	local neckCFrame = neckC0 * CFrame.Angles(theta * 0.5, 0, 0)
+	local waistCFrame = waistC0 * CFrame.Angles(theta * 0.5, currentWaistRotation, 0)
+
+	neck.C0 = neck.C0:Lerp(neckCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
+	waist.C0 = waist.C0:Lerp(waistCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
 
 	-- this is for other players to see
-	local neckCFrame = neckC0 * CFrame.Angles(theta * 0.5, -theta2, 0)
-	local waistCFrame = waistC0 * CFrame.Angles(theta * 0.5, 0, 0)
 	RedEvents.Network.Client.BodyCFrame:FireServer(neckCFrame, waistCFrame)
 end)
 
@@ -77,8 +85,8 @@ local function setMotors(playerTriggered: Player, neckCFrame: CFrame, waistCFram
 		return
 	end
 
-	neck.C0 = neckC0:Lerp(neckCFrame, 0.2)
-	waist.C0 = waist.C0:Lerp(waistC0, 0.2)
+	neck.C0 = neck.C0:Lerp(neckCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
+	waist.C0 = waist.C0:Lerp(waistCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
 end
 
 Players.PlayerRemoving:Connect(function(playerRemoved: Player)
@@ -92,7 +100,7 @@ RedEvents.Network.Server.ServerBodyCFrame:SetClientListener(
 		end
 
 		if not targetCFrames[playerTriggered.UserId] then
-			targetCFrames[playerTriggered.UserId] = { neckCFrame = CFrame.new(), waistCFrame = CFrame.new() }
+			targetCFrames[playerTriggered.UserId] = { neckCFrame = neckCFrame, waistCFrame = waistCFrame }
 		end
 
 		local playerTargets = targetCFrames[playerTriggered.UserId]
