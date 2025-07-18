@@ -9,14 +9,14 @@ local GlobalInfo = {}
 GlobalInfo.MAX_PLAYERS = 6 --int
 
 GlobalInfo.FLASHLIGHT = {
-	LIGHT_SWITCH_SPEED = 1, -- should be greater than 0.7
+	LIGHT_SWITCH_SPEED = 1, -- float - should be greater than 0.7
 }
 
 GlobalInfo.MOVEMENT = {
 	SPEED = { --character speed
 		WALKING = 8,
 		RUNNING = 16,
-		CROUCHING = 6,
+		CROUCHING = 5,
 	},
 	TRACKING = { --body to camera tracking
 		LOOK_LERP_SPEED = 0.2, --float
@@ -24,8 +24,8 @@ GlobalInfo.MOVEMENT = {
 	},
 	STAMINA = { --stamina bar
 		MAX_STAMINA = 100, --int
-		STAMINA_REGEN = 0.1, --float
-		STAMINA_DRAIN = 0.2, --float
+		STAMINA_REGEN = 0.2, --float
+		STAMINA_DRAIN = 0.4, --float
 	},
 }
 

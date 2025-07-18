@@ -65,8 +65,6 @@ function Light.new()
 	self:Track()
 	self:ConnectKey()
 
-	print("set")
-
 	return self
 end
 
@@ -193,8 +191,8 @@ function Light.ConnectKey(self: Light)
 		activatedFlashlight,
 		true,
 		3000,
-		Enum.KeyCode.F
-		--Enum.KeyCode.ButtonL1
+		Enum.KeyCode.F,
+		Enum.KeyCode.ButtonR1
 	)
 
 	self._cleaner:Add(function()
@@ -230,6 +228,7 @@ local function tagCharacter()
 
 	local root = player.Character:FindFirstChild("HumanoidRootPart")
 	if not root then
+		warn("Could not find root to attach Light tag")
 		return
 	end
 

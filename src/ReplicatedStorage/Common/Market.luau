@@ -2,9 +2,6 @@
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local Promise = require(ReplicatedStorage.Packages.promise)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 

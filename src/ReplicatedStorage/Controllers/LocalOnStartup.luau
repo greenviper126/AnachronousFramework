@@ -11,9 +11,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 require(ReplicatedStorage.Common.Sounds)
 require(ReplicatedStorage.Common.Inventory)
 
+require(ReplicatedStorage.ClientCommon.CameraBobbing)
 require(ReplicatedStorage.ClientCommon.Flashlight).SetCanActivate(true)
 
 --UI
 require(ReplicatedStorage.ClientCommon.Mouse)
+require(ReplicatedStorage.ClientCommon.Stamina)
 
 return {}

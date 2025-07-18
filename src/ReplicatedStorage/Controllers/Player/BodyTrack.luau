@@ -13,6 +13,7 @@ local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local neckC0 = CFrame.new(0, 0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 local waistC0 = CFrame.new(0, 0.2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 
+local prevRotation = 0
 RunService.RenderStepped:Connect(function(delta: number)
 	if player.Character == nil then
 		return
@@ -38,25 +39,31 @@ RunService.RenderStepped:Connect(function(delta: number)
 	-- for looking up and down
 	local theta = math.asin(camera.CFrame.LookVector.y)
 
-	-- this is for rotating the waist
-	local rotationVelocity = -math.sin(root.AssemblyAngularVelocity.Unit.Y) * GlobalInfo.MOVEMENT.TRACKING.TURN_STRENGTH
-	local currentWaistRotation = waistC0.Rotation.Y + (rotationVelocity - waistC0.Rotation.Y) * delta
-	if currentWaistRotation ~= currentWaistRotation then --can be NAN on start
-		currentWaistRotation = 0
-	end
+	-- -- this is for rotating the waist
+	-- local rotationVelocity = -math.sin(root.AssemblyAngularVelocity.Unit.Y) * GlobalInfo.MOVEMENT.TRACKING.TURN_STRENGTH
+	-- local currentWaistRotation = waistC0.Rotation.Y + (rotationVelocity - waistC0.Rotation.Y) * delta
+	-- if currentWaistRotation ~= currentWaistRotation then --can be NAN on start
+	-- 	currentWaistRotation = 0
+	-- end
 
-	--to help prevent snapping on waist
-	if math.abs(rotationVelocity) < 0.01 then
-		currentWaistRotation = currentWaistRotation * 0.95
+	-- --to help prevent snapping on waist
+	-- if math.abs(rotationVelocity) < 0.01 then
+	-- 	currentWaistRotation = currentWaistRotation * 0.95
+	-- end
+
+	if math.abs(root.AssemblyAngularVelocity.Unit.Y) < 0.1 then
+		prevRotation = prevRotation * 0.5
 	end
 
 	-- this will set it locally for this player
 	local neck, waist = head.Neck, upperTorso.Waist
 	local neckCFrame = neckC0 * CFrame.Angles(theta * 0.5, 0, 0)
-	local waistCFrame = waistC0 * CFrame.Angles(theta * 0.5, currentWaistRotation, 0)
+	local waistCFrame = waistC0 * CFrame.Angles(theta * 0.5, -prevRotation, 0)
 
 	neck.C0 = neck.C0:Lerp(neckCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
 	waist.C0 = waist.C0:Lerp(waistCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
+
+	prevRotation = root.AssemblyAngularVelocity.Unit.Y
 
 	-- this is for other players to see
 	RedEvents.Network.Client.BodyCFrame:FireServer(neckCFrame, waistCFrame)
