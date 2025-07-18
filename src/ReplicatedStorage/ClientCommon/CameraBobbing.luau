@@ -1,6 +1,6 @@
 --!strict
 
-local IDLE_STRENGTH = 3.5
+local IDLE_STRENGTH = 1
 local TURN_STRENGTH = 1
 
 --[[
@@ -85,7 +85,7 @@ end
 	@param self Stamina - object
 ]]
 function Stamina.OnStart(self: Stamina)
-	self.humanoid.CameraOffset = (self.root.CFrame + Vector3.new(0, 2, 0)):ToObjectSpace(self.head.CFrame).Position
+	--self.humanoid.CameraOffset = (self.root.CFrame + Vector3.new(0, 1, 0)):ToObjectSpace(self.head.CFrame).Position
 end
 
 --[[
@@ -97,17 +97,17 @@ function Stamina.GetBobbingValues(type: "Crouch" | "Walk" | "Sprint" | "Idle"): 
 	local tickMultiplier, verticalMultiplier, horizontalMultiplier = 1, 0.001, 0.001
 
 	if type == "Walk" then
-		tickMultiplier = 4.5
-		verticalMultiplier = 0.0015
-		horizontalMultiplier = 0.002
-	elseif type == "Crouch" then
 		tickMultiplier = 3.5
-		verticalMultiplier = 0.0013
-		horizontalMultiplier = 0.0016
+		verticalMultiplier = 0.07
+		horizontalMultiplier = 0.03
+	elseif type == "Crouch" then
+		tickMultiplier = 1.8
+		verticalMultiplier = 0.05
+		horizontalMultiplier = 0.018
 	elseif type == "Sprint" then
-		tickMultiplier = 7.5
-		verticalMultiplier = 0.002
-		horizontalMultiplier = 0.003
+		tickMultiplier = 5
+		verticalMultiplier = 0.13
+		horizontalMultiplier = 0.07
 	elseif type == "Idle" then
 		tickMultiplier = 0
 		verticalMultiplier = 0
@@ -119,8 +119,8 @@ function Stamina.GetBobbingValues(type: "Crouch" | "Walk" | "Sprint" | "Idle"): 
 	local x = math.sin(t * 2)
 	local y = math.sin(t)
 
-	local verticalBob = x * verticalMultiplier
-	local horizontalBob = y * horizontalMultiplier
+	local verticalBob = x * verticalMultiplier * 0.01
+	local horizontalBob = y * horizontalMultiplier * 0.01
 
 	return verticalBob, horizontalBob
 end
@@ -136,8 +136,8 @@ function Stamina.Track(self: Stamina)
 
 		local velocity = self.root.AssemblyLinearVelocity
 		local speed = Vector3.new(velocity.X, 0, velocity.Z).Magnitude
-
 		local strength = IDLE_STRENGTH * (1 - (speed / GlobalInfo.MOVEMENT.SPEED.RUNNING))
+
 		if delta > 1.5 then
 			func1, func2 = 0, 0
 		else

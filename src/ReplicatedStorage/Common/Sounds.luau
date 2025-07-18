@@ -146,6 +146,7 @@ end
 ]]
 function Sounds.CreateSound(soundData: SoundTable): Sound
 	local newSound = Instance.new("Sound")
+	newSound:SetAttribute("IsFrameworkSound", true)
 
 	if not _sounds then
 		newSound.Name = "SoundsNotLoadedYet"

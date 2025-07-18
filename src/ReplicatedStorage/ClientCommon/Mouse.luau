@@ -1,6 +1,6 @@
 --!strict
 
-local DEFAULT_MOUSE_IMAGE = 9129033463 --white circle
+local DEFAULT_MOUSE_IMAGE = 6803353442 --9129033463 --white circle
 local MOUSE_OFFSET = 57 -- I think what causes this is the Roblox TopBar
 
 local Players = game:GetService("Players")
@@ -24,7 +24,7 @@ local dot = Instance.new("ImageLabel")
 dot.Name = "Dot"
 dot.AnchorPoint = Vector2.new(0.5, 0.5)
 dot.Position = UDim2.fromScale(0.5, 0.5)
-dot.Size = UDim2.new(0.03, 10, 0.03, 10)
+dot.Size = UDim2.new(0, 20, 0, 20)
 dot.SizeConstraint = Enum.SizeConstraint.RelativeXX
 dot.Image = "rbxassetid://" .. DEFAULT_MOUSE_IMAGE
 dot.BackgroundTransparency = 1

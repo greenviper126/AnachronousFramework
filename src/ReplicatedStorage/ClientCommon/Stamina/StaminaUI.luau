@@ -15,7 +15,7 @@ return {
 		stamina1.AnchorPoint = Vector2.new(0.5, 1)
 		stamina1.BackgroundTransparency = 1
 		stamina1.Position = UDim2.fromScale(0.5, 1)
-		stamina1.Size = UDim2.new(1, 0, 0.02, 5)
+		stamina1.Size = UDim2.new(1, 0, 0.012, 5)
 
 		local bar = Instance.new("Frame")
 		bar.Name = "Bar"

@@ -92,6 +92,8 @@ function Stamina.new(root: Part)
 	self.breathingSound.Volume = 0
 	self.breathingSound:Play()
 
+	self.staminaHolder.GroupTransparency = 1
+
 	self:SetWalkSpeed("Walk")
 	self:Track()
 	self:ConnectKey()
@@ -198,6 +200,22 @@ function Stamina.SetBreathingSound(self: Stamina)
 end
 
 --[[
+	Plays Breathing sound by using a curve
+
+	@param self Stamina - object
+]]
+function Stamina.SetFade(self: Stamina)
+	local transparencyAdd = 0
+	if self:GetStaminaPercentage() == 1 then
+		transparencyAdd += 0.05
+	else
+		transparencyAdd -= 0.05
+	end
+
+	self.staminaHolder.GroupTransparency = math.clamp(self.staminaHolder.GroupTransparency + transparencyAdd, 0, 1)
+end
+
+--[[
 	Will turn the Stamina on and off with added sounds and timing.
 
 	@param self Stamina - object
@@ -205,6 +223,7 @@ end
 ]]
 function Stamina.Track(self: Stamina)
 	self._cleaner:Connect(RunService.Heartbeat, function()
+		self:SetFade()
 		self:SetReachBottom()
 		self:SetBreathingSound()
 

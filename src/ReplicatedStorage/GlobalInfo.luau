@@ -24,8 +24,8 @@ GlobalInfo.MOVEMENT = {
 	},
 	STAMINA = { --stamina bar
 		MAX_STAMINA = 100, --int
-		STAMINA_REGEN = 0.2, --float
-		STAMINA_DRAIN = 0.4, --float
+		STAMINA_REGEN = 0.07, --float
+		STAMINA_DRAIN = 0.11, --float
 	},
 }
 
