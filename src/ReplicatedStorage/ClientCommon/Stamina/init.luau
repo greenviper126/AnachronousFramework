@@ -20,9 +20,12 @@ local Utility = require(ReplicatedStorage.Utility)
 --local Market = require(ReplicatedStorage.Common.Market)
 local Sounds = require(ReplicatedStorage.Common.Sounds)
 
+local CameraBobbing = require(ReplicatedStorage.ClientCommon.CameraBobbing)
+
 local StaminaUI = require(script.StaminaUI)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local camera = workspace.CurrentCamera
 
 --variables across objects
 local canSprint = true
@@ -44,13 +47,16 @@ type self = {
 	breathingSound: Sound,
 
 	currentStamina: number,
+	prevClick: number,
+	regenPauseTime: number,
 
+	reachedTop: boolean,
 	reachedBottom: boolean,
-
 	requestingSprint: boolean,
 	requestingCrouch: boolean,
 
-	prevClick: number,
+	prevFovState: boolean,
+	isFirstPerson: boolean,
 
 	_cleaner: typeof(Trove.new()),
 }
@@ -93,6 +99,7 @@ function Stamina.new(root: Part)
 	self.breathingSound:Play()
 
 	self.staminaHolder.GroupTransparency = 1
+	self.regenPauseTime = 0
 
 	self:SetWalkSpeed("Walk")
 	self:Track()
@@ -141,6 +148,10 @@ function Stamina.Regen(self: Stamina)
 		self:SetWalkSpeed("Walk")
 	end
 
+	if time() - self.regenPauseTime < GlobalInfo.MOVEMENT.STAMINA.REGEN_PAUSE then
+		return
+	end
+
 	self.currentStamina = math.clamp(
 		self.currentStamina + GlobalInfo.MOVEMENT.STAMINA.STAMINA_REGEN * regenMultiplier,
 		0,
@@ -157,11 +168,20 @@ end
 	@param self Stamina - object
 ]]
 function Stamina.Drain(self: Stamina)
+	self.regenPauseTime = time()
+
 	self:SetWalkSpeed("Sprint")
 
 	local velocity = self.root.AssemblyLinearVelocity
 	local velocityXZ = Vector3.new(velocity.X, 0, velocity.Z)
-	if velocityXZ.Magnitude < GlobalInfo.MOVEMENT.SPEED.WALKING + 0.5 then
+	if velocityXZ.Magnitude < GlobalInfo.MOVEMENT.SPEED.WALKING + 0.5 then -- not running when holding shift
+		self:Regen()
+		return
+	end
+
+	local localVelocity = self.root.CFrame:VectorToObjectSpace(velocity)
+	if localVelocity.Z > 0.03 then --backwards (its a positive number)
+		self.requestingSprint = false
 		self:Regen()
 		return
 	end
@@ -185,8 +205,17 @@ function Stamina.SetReachBottom(self: Stamina)
 	if self:GetStaminaPercentage() == 0 then
 		self.reachedBottom = true
 		self:SetWalkSpeed("Walk")
+		self.staminaBar.BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR
 	elseif self:GetStaminaPercentage() >= 0.5 then
 		self.reachedBottom = false
+
+		if self.staminaBar.BackgroundColor3 == GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR then
+			TweenService:Create(
+				self.staminaBar,
+				TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.TIRED_TRANSITION_TIME, Enum.EasingStyle.Sine),
+				{ BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR }
+			):Play()
+		end
 	end
 end
 
@@ -205,14 +234,67 @@ end
 	@param self Stamina - object
 ]]
 function Stamina.SetFade(self: Stamina)
-	local transparencyAdd = 0
-	if self:GetStaminaPercentage() == 1 then
-		transparencyAdd += 0.05
-	else
-		transparencyAdd -= 0.05
+	if not self.reachedTop and self:GetStaminaPercentage() == 1 then
+		self.reachedTop = true
+
+		TweenService:Create(
+			self.staminaHolder,
+			TweenInfo.new(
+				GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME,
+				Enum.EasingStyle.Sine,
+				Enum.EasingDirection.InOut,
+				0,
+				false,
+				GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_WAIT_TIME
+			),
+			{ GroupTransparency = 1 }
+		):Play()
+	elseif self.reachedTop and self:GetStaminaPercentage() ~= 1 then
+		self.reachedTop = false
+
+		TweenService:Create(
+			self.staminaHolder,
+			TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME, Enum.EasingStyle.Sine),
+			{ GroupTransparency = 0 }
+		):Play()
+	end
+end
+
+--[[
+	Plays Breathing sound by using a curve
+
+	@param self Stamina - object
+]]
+function Stamina.SetFOV(self: Stamina)
+	if not self.isFirstPerson then
+		return
 	end
 
-	self.staminaHolder.GroupTransparency = math.clamp(self.staminaHolder.GroupTransparency + transparencyAdd, 0, 1)
+	if self.root.AssemblyLinearVelocity.Magnitude >= GlobalInfo.MOVEMENT.SPEED.RUNNING - 1 then
+		if self.prevFovState == true then
+			return
+		end
+		self.prevFovState = true
+
+		TweenService:Create(
+			camera,
+			TweenInfo.new(0.3, Enum.EasingStyle.Sine),
+			{ FieldOfView = GlobalInfo.CAMERA.DEFAULT_FOV + GlobalInfo.MOVEMENT.STAMINA.FOV_ZOOM_OUT }
+		):Play()
+	else
+		if self.prevFovState == false then
+			return
+		end
+		self.prevFovState = false
+
+		TweenService
+			:Create(
+				camera,
+				TweenInfo.new(0.3, Enum.EasingStyle.Sine),
+				{ FieldOfView = GlobalInfo.CAMERA.DEFAULT_FOV + 0 }
+			)
+			:Play()
+	end
 end
 
 --[[
@@ -226,12 +308,20 @@ function Stamina.Track(self: Stamina)
 		self:SetFade()
 		self:SetReachBottom()
 		self:SetBreathingSound()
+		self:SetFOV()
 
 		if not self.requestingSprint or self.reachedBottom then
 			self:Regen()
 		else
 			self:Drain()
 		end
+	end)
+
+	CameraBobbing.ConnectAndListenToFirstPersonType(function()
+		self.isFirstPerson = true
+	end, function()
+		self.isFirstPerson = false
+		camera.FieldOfView = GlobalInfo.CAMERA.DEFAULT_FOV
 	end)
 end
 

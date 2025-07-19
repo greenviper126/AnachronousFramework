@@ -51,7 +51,12 @@ RunService.RenderStepped:Connect(function(delta: number)
 	-- 	currentWaistRotation = currentWaistRotation * 0.95
 	-- end
 
-	if math.abs(root.AssemblyAngularVelocity.Unit.Y) < 0.1 then
+	local velocityIsNAN = false --weird issues happen without this
+	if root.AssemblyAngularVelocity ~= root.AssemblyAngularVelocity then
+		velocityIsNAN = true
+	end
+
+	if not velocityIsNAN and math.abs(root.AssemblyAngularVelocity.Unit.Y) < 0.1 then
 		prevRotation = prevRotation * 0.5
 	end
 
@@ -63,7 +68,7 @@ RunService.RenderStepped:Connect(function(delta: number)
 	neck.C0 = neck.C0:Lerp(neckCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
 	waist.C0 = waist.C0:Lerp(waistCFrame, GlobalInfo.MOVEMENT.TRACKING.LOOK_LERP_SPEED)
 
-	prevRotation = root.AssemblyAngularVelocity.Unit.Y
+	prevRotation = velocityIsNAN and root.AssemblyAngularVelocity.Unit.Y or 0
 
 	-- this is for other players to see
 	RedEvents.Network.Client.BodyCFrame:FireServer(neckCFrame, waistCFrame)

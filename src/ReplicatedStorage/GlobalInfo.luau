@@ -12,6 +12,10 @@ GlobalInfo.FLASHLIGHT = {
 	LIGHT_SWITCH_SPEED = 1, -- float - should be greater than 0.7
 }
 
+GlobalInfo.CAMERA = {
+	DEFAULT_FOV = 80,
+}
+
 GlobalInfo.MOVEMENT = {
 	SPEED = { --character speed
 		WALKING = 8,
@@ -26,6 +30,14 @@ GlobalInfo.MOVEMENT = {
 		MAX_STAMINA = 100, --int
 		STAMINA_REGEN = 0.07, --float
 		STAMINA_DRAIN = 0.11, --float
+
+		FOV_ZOOM_OUT = 7, --int
+		REGEN_PAUSE = 1.5, --float
+		FULL_STAMIN_WAIT_TIME = 1.5, --float
+		FULL_STAMIN_FADE_TIME = 1, --float
+		TIRED_TRANSITION_TIME = 1.5, --float
+		DEFAULT_BAR_COLOR = Color3.new(1, 1, 1), --Color3
+		TIRED_BAR_COLOR = Color3.new(0.6, 0.6, 0.6), --Color3
 	},
 }
 

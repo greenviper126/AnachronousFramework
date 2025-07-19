@@ -63,6 +63,7 @@ local fromSignalServer = {}
 --client side
 local fromSignalClient = {
 	Flashlight = Signal(),
+	FootStep = Signal(),
 }
 
 --[[
