@@ -3,6 +3,8 @@
 --roblox/luau-tag-utils
 
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 --[[
 	Get instances with all specified tags
@@ -100,12 +102,13 @@ end
 --[[
 	Basic setup for listening in on tags for OOP structures
 
-	@param class T&any - A metatable with some certain requirements
+	@param _constructor T&any - The constructor to set the type
+	@param class any - A metatable with some certain requirements
 
 	@return () -> () - Cleanup function
 	@return () -> ({ [Instance]: T }) - Instances that have been attached to this class
 ]]
-local function setObjectListner<T>(class: T & any): (() -> (), () -> { [Instance]: T })
+local function setObjectListner<T>(_constructor: T, class: any): (() -> (), () -> { [Instance]: T })
 	local instances = {}
 
 	local instanceAddedSignal = CollectionService:GetInstanceAddedSignal(class.TAG_NAME)
@@ -139,6 +142,56 @@ local function setObjectListner<T>(class: T & any): (() -> (), () -> { [Instance
 end
 
 --[[
+	Will add a tag to the player character root when they spawn in
+
+	This serves as the replacement for player character scripts
+
+	@param tag string - Tag for character
+
+	@return RBXScriptConnection - Disconnects connection
+]]
+local function tagCharacterConnection(tag: string, tagPlayer: Player?): RBXScriptConnection?
+	local player = tagPlayer
+
+	if player == nil and RunService:IsClient() then
+		player = Players.LocalPlayer
+	else
+		warn("TagCharacterConnection Needs a specified player on Server, Tag: " .. tag)
+	end
+
+	if not player then
+		return
+	end
+
+	local function tagCharacter()
+		if not player or not player.Character then
+			return
+		end
+
+		local root = player.Character:FindFirstChild("HumanoidRootPart")
+		if not root then
+			warn("Could not find root to attach " .. tag .. " Tag.")
+			return
+		end
+
+		root:AddTag(tag)
+	end
+
+	tagCharacter()
+	return player.CharacterAdded:Connect(function()
+		tagCharacter()
+	end)
+end
+
+local function getUniqueClass<T>(tag: string, objects: () -> { [Instance]: T }): T?
+	local instance = getUnique(tag)
+	if not instance then
+		return
+	end
+	return objects()[instance] :: any
+end
+
+--[[
 	Taging library with some custom extensions for OOP
 ]]
 return {
@@ -146,4 +199,6 @@ return {
 	GetAll = getAll,
 	GetAny = getAny,
 	SetObjectListner = setObjectListner,
+	TagCharacterConnection = tagCharacterConnection,
+	GetUniqueClass = getUniqueClass,
 }

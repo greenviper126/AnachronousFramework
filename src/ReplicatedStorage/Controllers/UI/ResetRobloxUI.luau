@@ -11,9 +11,11 @@ local function setScreen(boolean)
 	--StarterGui:SetCore("ResetButtonCallback", boolean)
 end
 
-while true do --roblox is dumb so im gonna just be safe here and loop
-	setScreen(false)
-	task.wait(0.5)
-end
+task.spawn(function()
+	while true do --roblox is dumb so im gonna just be safe here and loop
+		setScreen(false)
+		task.wait(0.5)
+	end
+end)
 
 return {}

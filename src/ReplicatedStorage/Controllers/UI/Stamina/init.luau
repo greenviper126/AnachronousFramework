@@ -15,12 +15,13 @@ local TweenService = game:GetService("TweenService")
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+local RedEvents = require(ReplicatedStorage.RedEvents)
 local Utility = require(ReplicatedStorage.Utility)
 
 --local Market = require(ReplicatedStorage.Common.Market)
 local Sounds = require(ReplicatedStorage.Common.Sounds)
 
-local CameraBobbing = require(ReplicatedStorage.ClientCommon.CameraBobbing)
+local CameraBobbing = require(ReplicatedStorage.ClientCommon.CameraUtility)
 
 local StaminaUI = require(script.StaminaUI)
 
@@ -68,15 +69,19 @@ export type Stamina = typeof(setmetatable({} :: self, Stamina))
 
 	@return self - the new object
 ]]
-function Stamina.new(root: Part)
+function Stamina.new(root: Part?)
+	if not root then
+		return
+	end
+
 	local humanoid = root.Parent and root.Parent:FindFirstChildWhichIsA("Humanoid") or nil
-	assert(humanoid, "Could not find humanoid for StaminaBar, Player:" .. player.Name)
+	assert(humanoid, "Could not find humanoid for " .. Stamina.TAG_NAME)
 
 	local breathingSound = Sounds.FindSoundByName("StaminaBreathing", nil, root)
-	assert(breathingSound, "Could not find Sound for StaminaBar, Player:" .. player.Name)
+	assert(breathingSound, "Could not find Sound for " .. Stamina.TAG_NAME)
 
 	if not Utility.Tags.GetUnique(Stamina.TAG_NAME) then
-		warn("There is more than one object with the Stamina Tag")
+		warn("There is more than one object with the " .. Stamina.TAG_NAME .. " Tag")
 	end
 
 	local self = setmetatable({} :: self, Stamina)
@@ -158,7 +163,7 @@ function Stamina.Regen(self: Stamina)
 		GlobalInfo.MOVEMENT.STAMINA.MAX_STAMINA
 	)
 
-	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.new(self:GetStaminaPercentage(), 0, 1, 0) })
+	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.fromScale(self:GetStaminaPercentage(), 1) })
 		:Play()
 end
 
@@ -192,7 +197,7 @@ function Stamina.Drain(self: Stamina)
 		GlobalInfo.MOVEMENT.STAMINA.MAX_STAMINA
 	)
 
-	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.new(self:GetStaminaPercentage(), 0, 1, 0) })
+	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.fromScale(self:GetStaminaPercentage(), 1) })
 		:Play()
 end
 
@@ -310,6 +315,14 @@ function Stamina.Track(self: Stamina)
 		self:SetBreathingSound()
 		self:SetFOV()
 
+		if not canSprint then
+			self.requestingSprint = false
+		end
+
+		if not canCrouch then
+			self.requestingCrouch = false
+		end
+
 		if not self.requestingSprint or self.reachedBottom then
 			self:Regen()
 		else
@@ -335,11 +348,6 @@ function Stamina.ConnectKey(self: Stamina)
 	local function activatedStamina(_actionName: string, inputState: Enum.UserInputState, _inputObject: InputObject)
 		if inputState == Enum.UserInputState.End then
 			self.requestingSprint = false
-			return Enum.ContextActionResult.Pass
-		end
-
-		if not canSprint then
-			self:SetWalkSpeed("Walk")
 			return Enum.ContextActionResult.Pass
 		end
 
@@ -374,11 +382,6 @@ function Stamina.ConnectKey(self: Stamina)
 	local function activatedCrouch(_actionName: string, inputState: Enum.UserInputState, _inputObject: InputObject)
 		if inputState == Enum.UserInputState.End then
 			self.requestingCrouch = false
-			return Enum.ContextActionResult.Pass
-		end
-
-		if not canCrouch then
-			self:SetWalkSpeed("Walk")
 			return Enum.ContextActionResult.Pass
 		end
 
@@ -421,106 +424,40 @@ end
 
 -------------------------------------------------------------------------------------------
 
-local _cleanup, objects = Utility.Tags.SetObjectListner(Stamina)
-
-local function _getObject(): typeof(Stamina.new(Instance.new("Part")))?
-	local instance = Utility.Tags.GetUnique(Stamina.TAG_NAME)
-	if not instance then
-		return
-	end
-	return objects()[instance] :: any
-end
-
-local function tagCharacter()
-	if not player.Character then
-		return
-	end
-
-	local root = player.Character:FindFirstChild("HumanoidRootPart")
-	if not root then
-		warn("Could not find root to attach Stamina tag")
-		return
-	end
-
-	root:AddTag(Stamina.TAG_NAME)
-end
-
-tagCharacter()
-player.CharacterAdded:Connect(function()
-	tagCharacter()
-end)
+local _characterTagConnection = Utility.Tags.TagCharacterConnection(Stamina.TAG_NAME)
+local _cleanup, _objects = Utility.Tags.SetObjectListner(Stamina.new(), Stamina)
+local _uniqueClass = Utility.Tags.GetUniqueClass(Stamina.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
-local StaminaBar = {}
+local receiveSignal = RedEvents.SystemConnect.ConnectClient("Stamina")
 
---[[
-    Will determine if the player is allowed to use there Stamina or not.
-
-    @param activate boolean - can it be activated by player?
-]]
-function Stamina.SetCanSprint(activate: boolean)
+receiveSignal("SetCanSprint", function(activate: boolean)
 	canSprint = activate
-end
+end)
 
---[[
-    Checks if the Stamina was activated so it can be used.
-
-    @return boolean - is it possible to activate?
-]]
-function Stamina.GetCanSprint(): boolean
+receiveSignal("GetCanSprint", function(): boolean
 	return canSprint
-end
+end)
 
---[[
-    Will determine if the player is allowed to use there Crouch or not.
-
-    @param activate boolean - can it be activated by player?
-]]
-function Stamina.SetCanCrouch(activate: boolean)
+receiveSignal("SetCanCrouch", function(activate: boolean)
 	canCrouch = activate
-end
+end)
 
---[[
-    Checks if the Crouch was activated so it can be used.
-
-    @return boolean - is it possible to activate?
-]]
-function Stamina.GetCanCrouch(): boolean
+receiveSignal("GetCanCrouch", function(): boolean
 	return canCrouch
-end
+end)
 
---[[
-    Sets the speed multiplier
-
-	Used for side meter
-
-    @param multiplier number - The number to multiply the speed
-]]
-function Stamina.SetSpeedMultiplier(multiplier: number?)
+receiveSignal("SetSpeedMultiplier", function(multiplier: number?)
 	Stamina.speedMultiplier = multiplier or 1
-end
+end)
 
---[[
-    Sets the regen multiplier
-
-	Used for side meter
-
-    @param multiplier number - The number to multiply the regen speed
-]]
-function Stamina.SetRegenMultiplier(multiplier: number?)
+receiveSignal("SetRegenMultiplier", function(multiplier: number?)
 	Stamina.regenMultiplier = multiplier or 1
-end
+end)
 
---[[
-    Sets the drain multiplier
-
-	Used for side meter
-
-    @param multiplier number - The number to multiply the drain speed
-]]
-function Stamina.SetDrainMultiplier(multiplier: number?)
+receiveSignal("SetDrainMultiplier", function(multiplier: number?)
 	Stamina.drainMultiplier = multiplier or 1
-end
+end)
 
-return StaminaBar
+return {}

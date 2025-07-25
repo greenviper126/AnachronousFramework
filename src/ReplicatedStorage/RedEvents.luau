@@ -23,7 +23,7 @@ local fromNetworkServer = {
 	--functions
 
 	--unreliable
-	ServerBodyCFrame = Red.SharedEvent({
+	ServerBodyCFrame = Red.SharedEvent({ --send character CFrame info to players
 		Name = "ServerBodyCFrame",
 		Unreliable = true,
 	}, function(player, neck, waist)
@@ -41,12 +41,16 @@ local fromNetworkClient = {
 	end),
 
 	--functions
-	SoundsRequest = Red.Function("SoundsRequest", function() end, function(Table)
-		return Guard.Map(Guard.String, Guard.Any)(Table)
-	end),
+	SoundsRequest = Red.Function(
+		"SoundsRequest",
+		function() end,
+		function(Table) --send sound table to client on request
+			return Guard.Map(Guard.String, Guard.Any)(Table)
+		end
+	),
 
 	--unreliable
-	BodyCFrame = Red.SharedEvent({
+	BodyCFrame = Red.SharedEvent({ --send character CFrame info to server
 		Name = "BodyCFrame",
 		Unreliable = true,
 	}, function(neck, waist)
@@ -62,9 +66,72 @@ local fromSignalServer = {}
 
 --client side
 local fromSignalClient = {
-	Flashlight = Signal(),
-	FootStep = Signal(),
+	SystemResponse = Signal(),
+	SystemSignal = Signal(),
+
+	Flashlight = Signal(), --
+	FootStep = Signal(), --isRightFoot Boolean
 }
+
+--[[system connections]]
+----------------------------------------------------------------------------------------------------
+
+local function FireClientSystem(class: string): (string, ...any) -> ...any
+	local function sendInfo(name: string, ...: any): ...any
+		local results = { "nil" }
+		local connection = fromSignalClient.SystemResponse:Connect(function(newClass: string, newName: string, ...: any)
+			if newClass ~= class or newName ~= name then
+				return
+			end
+
+			results = { ... }
+		end)
+
+		fromSignalClient.SystemSignal:Fire(class, name, ...)
+
+		local function cleanup()
+			if connection then
+				connection()
+			end
+		end
+
+		--took to long to send back
+		task.delay(10, function()
+			if results[1] == "nil" then
+				warn("System Signal not received, class: " .. class .. ", name: " .. name .. ", Input: ", results)
+				cleanup()
+			end
+		end)
+
+		repeat
+			task.wait()
+		until results[1] ~= "nil"
+
+		cleanup()
+
+		return table.unpack(results)
+	end
+
+	return sendInfo
+end
+
+local function ConnectClientSystem(class: string)
+	local function connectInfo(name: string, signal: (...any) -> ...any): () -> ()
+		local cleanup = fromSignalClient.SystemSignal:Connect(function(newClass: string, newName: string, ...: any)
+			if newClass ~= class or newName ~= name then
+				return
+			end
+
+			fromSignalClient.SystemResponse:Fire(class, name, signal(...))
+		end)
+
+		return cleanup
+	end
+
+	return connectInfo
+end
+
+----------------------------------------------------------------------------------------------------
 
 --[[
 	Anything that needs an event or signal should go through here for security.
@@ -84,6 +151,10 @@ local RedSignalNetwork = {
 	Signal = {
 		Server = fromSignalServer,
 		Client = fromSignalClient,
+	},
+	SystemConnect = {
+		FireClient = FireClientSystem,
+		ConnectClient = ConnectClientSystem,
 	},
 	Ratelimit = Ratelimit,
 	NewSignal = Signal,

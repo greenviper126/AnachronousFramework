@@ -10,9 +10,9 @@ local UserInputService = game:GetService("UserInputService")
 
 local Input = require(ReplicatedStorage.Packages.input)
 
-local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local RedEvents = require(ReplicatedStorage.RedEvents)
 
-local mouse = {}
+local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 --mouse dot
 local MouseGUI = Instance.new("ScreenGui")
@@ -24,7 +24,7 @@ local dot = Instance.new("ImageLabel")
 dot.Name = "Dot"
 dot.AnchorPoint = Vector2.new(0.5, 0.5)
 dot.Position = UDim2.fromScale(0.5, 0.5)
-dot.Size = UDim2.new(0, 20, 0, 20)
+dot.Size = UDim2.fromOffset(20, 20)
 dot.SizeConstraint = Enum.SizeConstraint.RelativeXX
 dot.Image = "rbxassetid://" .. DEFAULT_MOUSE_IMAGE
 dot.BackgroundTransparency = 1
@@ -41,18 +41,14 @@ RunService.PreRender:Connect(function()
 	UserInputService.MouseIconEnabled = false --this should never appear
 end)
 
---[[
-	Set the image used for the players mouse
-]]
-function mouse.SetImage(imageID: number?)
+local receiveSignal = RedEvents.SystemConnect.ConnectClient("Mouse")
+
+receiveSignal("SetImage", function(imageID: number?)
 	dot.Image = "rbxassetid://" .. (imageID or DEFAULT_MOUSE_IMAGE)
-end
+end)
 
---[[
-	Sets the visibility of the mouse
-]]
-function mouse.SetOn(on: boolean)
+receiveSignal("SetOn", function(on: boolean)
 	dot.Visible = on
-end
+end)
 
-return mouse
+return {}

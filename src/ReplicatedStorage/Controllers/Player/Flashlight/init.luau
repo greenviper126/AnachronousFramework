@@ -8,6 +8,7 @@ local RunService = game:GetService("RunService")
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+local RedEvents = require(ReplicatedStorage.RedEvents)
 local Utility = require(ReplicatedStorage.Utility)
 
 local Market = require(ReplicatedStorage.Common.Market)
@@ -46,7 +47,7 @@ export type Light = typeof(setmetatable({} :: self, Light))
 ]]
 function Light.new()
 	if not Utility.Tags.GetUnique(Light.TAG_NAME) then
-		warn("There is more than one object with the Flashlight Tag")
+		warn("There is more than one object with the " .. Light.TAG_NAME .. " Tag")
 	end
 
 	local self = setmetatable({} :: self, Light)
@@ -211,85 +212,36 @@ end
 
 -------------------------------------------------------------------------------------------
 
-local _cleanup, objects = Utility.Tags.SetObjectListner(Light)
-
-local function getObject(): typeof(Light.new())?
-	local instance = Utility.Tags.GetUnique(Light.TAG_NAME)
-	if not instance then
-		return
-	end
-	return objects()[instance] :: any
-end
-
-local function tagCharacter()
-	if not player.Character then
-		return
-	end
-
-	local root = player.Character:FindFirstChild("HumanoidRootPart")
-	if not root then
-		warn("Could not find root to attach Light tag")
-		return
-	end
-
-	root:AddTag(Light.TAG_NAME)
-end
-
-tagCharacter()
-player.CharacterAdded:Connect(function()
-	tagCharacter()
-end)
+local _characterTagConnection = Utility.Tags.TagCharacterConnection(Light.TAG_NAME)
+local _cleanup, _objects = Utility.Tags.SetObjectListner(Light.new(), Light)
+local _uniqueClass = Utility.Tags.GetUniqueClass(Light.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
-local Flashlight = {}
+local receiveSignal = RedEvents.SystemConnect.ConnectClient("Flashlight")
 
---[[
-    Will determine if the player is allowed to use there flashlight or not.
-
-    @param activate boolean - can it be activated by player?
-]]
-function Flashlight.SetCanActivate(activate: boolean)
+receiveSignal("SetCanActivate", function(activate: boolean)
 	canActivate = activate
-end
+end)
 
---[[
-    Checks if the flashlight was activated so it can be used.
-
-    @return boolean - is it possible to activate?
-]]
-function Flashlight.GetCanActivate(): boolean
+receiveSignal("GetCanActivate", function(): boolean
 	return canActivate
-end
+end)
 
---[[
-    Checks if the Player is currently holding there light or not.
-
-    @return boolean - is the player holding a light?
-]]
-function Flashlight.HoldingLight(): boolean
-	local object = getObject()
-	if not object then
+receiveSignal("HoldingLight", function(): boolean
+	if not _uniqueClass then
 		return false
 	end
 
-	return object:IsHeld()
-end
+	return _uniqueClass:IsHeld()
+end)
 
---[[
-    Puts the light in the players hand or puts it away.
-
-    This only works if there Flashlight is Active.
-
-    @param holding boolean - should the player be holding the light currently?
-]]
-function Flashlight.SetLight(holding: boolean)
-	local object = getObject()
-	if not object then
+receiveSignal("SetLight", function(holding: boolean)
+	if not _uniqueClass then
 		return
 	end
 
-	object:TurnOn(holding)
-end
+	_uniqueClass:TurnOn(holding)
+end)
 
-return Flashlight
+return {}

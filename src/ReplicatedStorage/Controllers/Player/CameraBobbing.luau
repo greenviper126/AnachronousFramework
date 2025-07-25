@@ -22,12 +22,8 @@ local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 local Utility = require(ReplicatedStorage.Utility)
 
---local Market = require(ReplicatedStorage.Common.Market)
---local Sounds = require(ReplicatedStorage.Common.Sounds)
-
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
---local random = Random.new()
 local camera = workspace.CurrentCamera
 player:SetAttribute("IsFirstPerson", true)
 
@@ -60,15 +56,19 @@ export type CameraBobber = typeof(setmetatable({} :: self, CameraBobber))
 
 	@return self - the new object
 ]]
-function CameraBobber.new(root: Part)
+function CameraBobber.new(root: Part?)
+	if not root then
+		return
+	end
+
 	local humanoid = root.Parent and root.Parent:FindFirstChildWhichIsA("Humanoid") or nil
-	assert(humanoid, "Could not find humanoid for CameraBobbing, Player:" .. player.Name)
+	assert(humanoid, "Could not find humanoid for " .. CameraBobber.TAG_NAME)
 
 	local head = root.Parent and root.Parent:FindFirstChild("Head") :: BasePart or nil
-	assert(head, "Could not find Head for CameraBobbing, Player:" .. player.Name)
+	assert(head, "Could not find Head for " .. CameraBobber.TAG_NAME)
 
 	if not Utility.Tags.GetUnique(CameraBobber.TAG_NAME) then
-		warn("There is more than one object with the CameraBobber Tag")
+		warn("There is more than one object with the " .. CameraBobber.TAG_NAME .. " Tag")
 	end
 
 	local self = setmetatable({} :: self, CameraBobber)
@@ -208,7 +208,7 @@ end
 function CameraBobber.Track(self: CameraBobber)
 	local function setCameraType()
 		local isFirstPerson = player:GetAttribute("IsFirstPerson")
-		print(isFirstPerson)
+
 		if isFirstPerson then
 			self._cameraCleaner = self._cleaner:Extend()
 
@@ -251,101 +251,50 @@ end
 
 -------------------------------------------------------------------------------------------
 
-local _cleanup, objects = Utility.Tags.SetObjectListner(CameraBobber)
-
-local function _getObject(): typeof(CameraBobber.new(Instance.new("Part")))?
-	local instance = Utility.Tags.GetUnique(CameraBobber.TAG_NAME)
-	if not instance then
-		return
-	end
-	return objects()[instance] :: any
-end
-
-local function tagCharacter()
-	if not player.Character then
-		return
-	end
-
-	local root = player.Character:FindFirstChild("HumanoidRootPart")
-	if not root then
-		warn("Could not find root to attach CameraBobber tag")
-		return
-	end
-
-	root:AddTag(CameraBobber.TAG_NAME)
-end
-
-tagCharacter()
-player.CharacterAdded:Connect(function()
-	tagCharacter()
-end)
+local _characterTagConnection = Utility.Tags.TagCharacterConnection(CameraBobber.TAG_NAME)
+local _cleanup, _objects = Utility.Tags.SetObjectListner(CameraBobber.new(), CameraBobber)
+local _uniqueClass = Utility.Tags.GetUniqueClass(CameraBobber.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
-local CameraBobbing = {}
+local receiveSignal = RedEvents.SystemConnect.ConnectClient("CameraBobbing")
 
---[[
-    Sets the camera to fist person or unlocks it.
-
-    @param set boolean - Set to first person or unlock
-]]
-function CameraBobbing.SetFirstPerson(set: boolean)
+receiveSignal("SetFirstPerson", function(set)
 	player:SetAttribute("IsFirstPerson", set)
-end
+end)
 
---[[
-    Gets the camera state of fist person or unlock.
-
-    @return boolean - current state of first person or unlock
-]]
-function CameraBobbing.GetFirstPerson(): boolean
+receiveSignal("GetFirstPerson", function(): boolean
 	return player:GetAttribute("IsFirstPerson")
-end
+end)
 
---[[
-    Connect a function to the FirstPerson camera type
-	
-	Will run when the character dies or the camera type was switched to unlock
-
-    @param func () -> () - function you want to run
-]]
-function CameraBobbing.ConnectFunctionToFirstPersonType(func: () -> ())
-	local object = _getObject()
-	if not object then
+receiveSignal("ConnectFunctionToFirstPersonType", function(func: () -> ())
+	if not _uniqueClass then
+		print(1)
 		return
 	end
 
-	object:ConnectFunctionToFirstPersonType(func)
-end
+	_uniqueClass:ConnectFunctionToFirstPersonType(func)
+end)
 
---[[
-    Connect a function to the FirstPerson camera type to run while in first person
-	
-	Cleanup function will run when the character dies or the camera type was switched to unlock
-
-    @param run () -> () - function you want to run in first person
-	@param cleanup () -> () - function you want to cleanup the run
-]]
-function CameraBobbing.ConnectAndListenToFirstPersonType(run: () -> (), cleanup: () -> ())
-	local object = _getObject()
-	if not object then
+receiveSignal("ConnectAndListenToFirstPersonType", function(run: () -> (), cleanup: () -> ())
+	if not _uniqueClass then
 		return
 	end
 
-	object:ConnectFunctionToFirstPersonType(cleanup)
+	_uniqueClass:ConnectFunctionToFirstPersonType(cleanup)
 	run()
-	object._cleaner:Connect(player.AttributeChanged, function(attribute: string)
+	_uniqueClass._cleaner:Connect(player.AttributeChanged, function(attribute: string)
 		if attribute ~= "IsFirstPerson" then
 			return
 		end
 
 		local isFirstPerson = player:GetAttribute("IsFirstPerson")
 
-		object:ConnectFunctionToFirstPersonType(cleanup)
+		_uniqueClass:ConnectFunctionToFirstPersonType(cleanup)
 		if isFirstPerson then
 			run()
 		end
 	end)
-end
+end)
 
-return CameraBobbing
+return {}

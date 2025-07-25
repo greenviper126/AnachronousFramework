@@ -17,7 +17,7 @@ ModalGUI.Parent = player.PlayerGui
 local function newModal(name: string?): TextButton
 	local modal = Instance.new("TextButton")
 	modal.BackgroundTransparency = 0.99
-	modal.Size = UDim2.new(0, 1, 0, 1)
+	modal.Size = UDim2.fromOffset(1, 1)
 	modal.Modal = true
 	modal.ZIndex = 50
 	modal.Name = name or "Modal"

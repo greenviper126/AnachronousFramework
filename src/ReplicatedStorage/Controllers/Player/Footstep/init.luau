@@ -14,6 +14,8 @@ local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local humanoid: Humanoid? = nil
 local root: Part? = nil
 
+local variance = Sounds.Variance(0.97, 1.03, 0.97, 1.03)
+
 local lastFootstepSound = nil
 local function PlayFootstepSound(foot, material)
 	if not foot then
@@ -31,17 +33,18 @@ local function PlayFootstepSound(foot, material)
 	if soundId and soundId ~= lastFootstepSound then
 		lastFootstepSound = soundId
 
-		local variance = Sounds.Variance(0.97, 1.03, 0.97, 1.03)
-		local sfx = Sounds.FindSoundByName("Footstep", variance, root)
-		if not sfx then
-			return
-		end
+		task.spawn(function()
+			local sfx = Sounds.FindSoundByName("Footstep", variance, root)
+			if not sfx then
+				return
+			end
 
-		sfx.SoundId = soundId
-		sfx.Volume = (footsteps.volume[material] or 0.2) * variance.Volume
+			sfx.SoundId = soundId
+			sfx.Volume = (footsteps.volume[material] or 0.2) * variance.Volume
 
-		sfx.PlayOnRemove = true
-		sfx:Destroy()
+			sfx.PlayOnRemove = true
+			sfx:Destroy()
+		end)
 	else
 		PlayFootstepSound(foot, material)
 	end

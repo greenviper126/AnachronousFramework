@@ -2,6 +2,8 @@
 
 local RunService = game:GetService("RunService")
 
+local assetsLoader = require(script.AssetLoader)
+
 --starts modules from selected folder
 local function LoadFromFile(file: Instance)
 	local _files: { any } = {}
@@ -12,11 +14,17 @@ local function LoadFromFile(file: Instance)
 			if v:IsA("Folder") then
 				addModules(v)
 			elseif v:IsA("ModuleScript") then
-				fileRead = fileRead .. "\t" .. v.Name .. "\n"
-
-				task.spawn(function()
-					table.insert(_files, require(v) :: any)
+				local success, result = pcall(function()
+					return require(v) :: any
 				end)
+
+				if not success then
+					fileRead = fileRead .. "\t" .. v.Name .. " ERROR \n"
+					warn(v.Name .. " module did not load correctly!")
+				else
+					fileRead = fileRead .. "\t" .. v.Name .. "\n"
+					table.insert(_files, result)
+				end
 			end
 		end
 	end
@@ -42,6 +50,8 @@ end
 ]]
 return function()
 	if RunService:IsServer() then
+		assetsLoader()
+
 		local ServerStorage = game:GetService("ServerStorage")
 		local managers = ServerStorage:FindFirstChild("Managers")
 
