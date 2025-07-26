@@ -2,8 +2,8 @@
 
 export type SoundTable = { Sound: { [string]: any }, Children: { [string]: { [string]: any } } }
 export type VarianceTable = {
-	PlaybackSpeed: number,
-	Volume: number,
+	PlaybackSpeed: () -> number,
+	Volume: () -> number,
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -201,8 +201,8 @@ function Sounds.FindSoundByName(name: string, variance: VarianceTable?, parent: 
 		newSound.Parent = parent and parent or UnParentedSounds
 
 		if variance then
-			newSound.PlaybackSpeed = newSound.PlaybackSpeed * (variance.PlaybackSpeed or 1)
-			newSound.Volume = newSound.Volume * (variance.Volume or 1)
+			newSound.PlaybackSpeed = newSound.PlaybackSpeed * (variance.PlaybackSpeed() or 1)
+			newSound.Volume = newSound.Volume * (variance.Volume() or 1)
 		end
 	else
 		warn("Could not create sound named " .. name)
@@ -240,8 +240,12 @@ end
 ]]
 function Sounds.Variance(minSpeed: number?, maxSpeed: number?, minVolume: number?, maxVolume: number?): VarianceTable
 	return {
-		PlaybackSpeed = Random:NextNumber(minSpeed or 0.95, maxSpeed or 1.05),
-		Volume = Random:NextNumber(minVolume or 0.95, maxVolume or 1.05),
+		PlaybackSpeed = function()
+			return Random:NextNumber(minSpeed or 0.95, maxSpeed or 1.05)
+		end,
+		Volume = function()
+			return Random:NextNumber(minVolume or 0.95, maxVolume or 1.05)
+		end,
 	}
 end
 

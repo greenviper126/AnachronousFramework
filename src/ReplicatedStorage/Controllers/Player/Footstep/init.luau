@@ -40,7 +40,7 @@ local function PlayFootstepSound(foot, material)
 			end
 
 			sfx.SoundId = soundId
-			sfx.Volume = (footsteps.volume[material] or 0.2) * variance.Volume
+			sfx.Volume = (footsteps.volume[material] or 0.2) * variance.Volume()
 
 			sfx.PlayOnRemove = true
 			sfx:Destroy()
