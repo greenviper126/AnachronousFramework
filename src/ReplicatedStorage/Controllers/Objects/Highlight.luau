@@ -101,6 +101,7 @@ local _cleanup, _objects = Utility.Tags.SetObjectListner(HighlightHover.new(), H
 local receiveSignal = RedEvents.SystemConnect.ConnectClient("Highlight")
 
 receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): ProximityPrompt
+	print("________________________", parent)
 	local cleaner = Trove.new()
 
 	local prompt = Instance.new("ProximityPrompt")
@@ -120,6 +121,8 @@ receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): 
 		cleaner:Connect(prompt.PromptHidden, function()
 			base:SetAttribute("Enabled", false)
 		end)
+	else
+		warn("Could not find base to attach HighlightPrompt, Parent: " .. parent:GetFullName())
 	end
 
 	return prompt

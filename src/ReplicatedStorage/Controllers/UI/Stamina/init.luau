@@ -45,7 +45,9 @@ type self = {
 
 	staminaHolder: CanvasGroup,
 	staminaBar: Frame,
+
 	breathingSound: Sound,
+	crouchSound: Sound,
 
 	currentStamina: number,
 	prevClick: number,
@@ -55,6 +57,7 @@ type self = {
 	reachedBottom: boolean,
 	requestingSprint: boolean,
 	requestingCrouch: boolean,
+	prevCrouch: boolean,
 
 	prevFovState: boolean,
 	isFirstPerson: boolean,
@@ -80,6 +83,9 @@ function Stamina.new(root: Part?)
 	local breathingSound = Sounds.FindSoundByName("StaminaBreathing", nil, root)
 	assert(breathingSound, "Could not find Sound for " .. Stamina.TAG_NAME)
 
+	local crouchSound = Sounds.FindSoundByName("StaminaCrouch", nil, root)
+	assert(crouchSound, "Could not find Sound for " .. Stamina.TAG_NAME)
+
 	if not Utility.Tags.GetUnique(Stamina.TAG_NAME) then
 		warn("There is more than one object with the " .. Stamina.TAG_NAME .. " Tag")
 	end
@@ -103,6 +109,8 @@ function Stamina.new(root: Part?)
 	self.breathingSound.Volume = 0
 	self.breathingSound:Play()
 
+	self.crouchSound = crouchSound
+
 	self.staminaHolder.GroupTransparency = 1
 	self.regenPauseTime = 0
 
@@ -124,7 +132,7 @@ function Stamina.GetStaminaPercentage(self: Stamina): number
 end
 
 --[[
-	Sets the speed of the player
+	Sets the speed of the player and plays attached sounds
 
 	@param self Stamina - object
 	@param speed number - speed of player
@@ -139,6 +147,32 @@ function Stamina.SetWalkSpeed(self: Stamina, type: "Crouch" | "Walk" | "Sprint")
 	elseif type == "Sprint" then
 		self.humanoid.WalkSpeed = GlobalInfo.MOVEMENT.SPEED.RUNNING * setMultiplier
 	end
+
+	--crouchSound
+	if type == "Crouch" and not self.prevCrouch then
+		self.prevCrouch = true
+		self.crouchSound.PlaybackSpeed = 1
+		self.crouchSound:Play()
+	elseif type ~= "Crouch" and self.prevCrouch then
+		self.prevCrouch = false
+		self.crouchSound.PlaybackSpeed = 0.8
+		self.crouchSound:Play()
+	end
+
+	--breathingSound
+	local volumeGoal = 0
+	if self.reachedBottom then
+		volumeGoal = 0.1
+	elseif type == "Sprint" then
+		volumeGoal = 0.04
+	else
+		volumeGoal = 0
+	end
+
+	self.breathingSound.Volume = math.lerp(self.breathingSound.Volume, volumeGoal, 0.01)
+
+	--for animation systems to read
+	RedEvents.Signal.Client.WalkState:Fire(type)
 end
 
 --[[
@@ -202,7 +236,7 @@ function Stamina.Drain(self: Stamina)
 end
 
 --[[
-	determines when the player drained there stamina too much
+	Determines when the player drained there stamina too much
 
 	@param self Stamina - object
 ]]
@@ -225,16 +259,7 @@ function Stamina.SetReachBottom(self: Stamina)
 end
 
 --[[
-	Plays Breathing sound by using a curve
-
-	@param self Stamina - object
-]]
-function Stamina.SetBreathingSound(self: Stamina)
-	self.breathingSound.Volume = (1 - self:GetStaminaPercentage()) ^ 6 / 4
-end
-
---[[
-	Plays Breathing sound by using a curve
+	Fades the stamina bar out once full
 
 	@param self Stamina - object
 ]]
@@ -266,7 +291,7 @@ function Stamina.SetFade(self: Stamina)
 end
 
 --[[
-	Plays Breathing sound by using a curve
+	Changes fov so player looks like there running fast
 
 	@param self Stamina - object
 ]]
@@ -303,7 +328,7 @@ function Stamina.SetFOV(self: Stamina)
 end
 
 --[[
-	Will turn the Stamina on and off with added sounds and timing.
+	Main loop
 
 	@param self Stamina - object
 	@param on boolean - turn the Stamina on?
@@ -312,7 +337,6 @@ function Stamina.Track(self: Stamina)
 	self._cleaner:Connect(RunService.Heartbeat, function()
 		self:SetFade()
 		self:SetReachBottom()
-		self:SetBreathingSound()
 		self:SetFOV()
 
 		if not canSprint then
@@ -320,6 +344,10 @@ function Stamina.Track(self: Stamina)
 		end
 
 		if not canCrouch then
+			self.requestingCrouch = false
+		end
+
+		if self.requestingSprint then
 			self.requestingCrouch = false
 		end
 
@@ -381,7 +409,6 @@ function Stamina.ConnectKey(self: Stamina)
 	--crouch
 	local function activatedCrouch(_actionName: string, inputState: Enum.UserInputState, _inputObject: InputObject)
 		if inputState == Enum.UserInputState.End then
-			self.requestingCrouch = false
 			return Enum.ContextActionResult.Pass
 		end
 
@@ -394,7 +421,7 @@ function Stamina.ConnectKey(self: Stamina)
 			return Enum.ContextActionResult.Pass
 		end
 
-		self.requestingCrouch = true
+		self.requestingCrouch = not self.requestingCrouch
 
 		return Enum.ContextActionResult.Sink
 	end
@@ -404,6 +431,7 @@ function Stamina.ConnectKey(self: Stamina)
 		activatedCrouch,
 		true,
 		3000,
+		Enum.KeyCode.C,
 		Enum.KeyCode.LeftControl,
 		Enum.KeyCode.ButtonR1
 	)

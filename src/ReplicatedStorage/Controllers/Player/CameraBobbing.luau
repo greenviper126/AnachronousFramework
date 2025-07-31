@@ -14,6 +14,7 @@ local TURN_STRENGTH = 1
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local Trove = require(ReplicatedStorage.Packages.trove)
@@ -42,6 +43,9 @@ type self = {
 	root: Part,
 	humanoid: Humanoid,
 	head: BasePart,
+
+	isCrouched: boolean,
+	prevCrouch: boolean,
 
 	rightStep: boolean,
 
@@ -77,6 +81,9 @@ function CameraBobber.new(root: Part?)
 	self.root = root
 	self.humanoid = humanoid
 	self.head = head
+
+	self.prevCrouch = false
+	self.isCrouched = false
 
 	self:OnStart()
 	self:Track()
@@ -151,6 +158,16 @@ function CameraBobber.BobbingFrame(self: CameraBobber, delta: number)
 	local velocity = self.root.AssemblyLinearVelocity
 	local speed = Vector3.new(velocity.X, 0, velocity.Z).Magnitude
 	local strength = IDLE_STRENGTH * (1 - (speed / GlobalInfo.MOVEMENT.SPEED.RUNNING))
+
+	--setting camera height for crouch
+	if self.isCrouched ~= self.prevCrouch then
+		self.prevCrouch = self.isCrouched
+
+		local goal = Vector3.new(0, self.isCrouched and -1.3 or 0, 0)
+		local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad)
+
+		TweenService:Create(self.humanoid, info, { CameraOffset = goal }):Play()
+	end
 
 	if delta > 1.5 then
 		func1, func2 = 0, 0
@@ -254,6 +271,13 @@ end
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(CameraBobber.TAG_NAME)
 local _cleanup, _objects = Utility.Tags.SetObjectListner(CameraBobber.new(), CameraBobber)
 local _uniqueClass = Utility.Tags.GetUniqueClass(CameraBobber.TAG_NAME, _objects)
+
+RedEvents.Signal.Client.WalkState:Connect(function(state: "Crouch" | "Walk" | "Sprint")
+	if not _uniqueClass then
+		return
+	end
+	_uniqueClass.isCrouched = (state == "Crouch")
+end)
 
 -------------------------------------------------------------------------------------------
 

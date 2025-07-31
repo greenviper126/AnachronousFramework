@@ -1,6 +1,8 @@
 --!strict
 
 local ALMOST_ZERO = 0.001 -- to fix weight issue
+local FALL_VELOCITY_THRESHOLD = 25
+
 export type animations<T> = {
 	Idle: T,
 	Walk: T,
@@ -11,10 +13,11 @@ export type animations<T> = {
 }
 
 local Players = game:GetService("Players")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
 local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local character = player.Character or player.CharacterAdded:Wait()
@@ -73,6 +76,7 @@ end
 RunService.Heartbeat:Connect(function()
 	local velocity = root.AssemblyLinearVelocity
 	local velocityXZ = Vector3.new(velocity.X, 0, velocity.Z)
+	local isFalling = -(FALL_VELOCITY_THRESHOLD + math.clamp(velocity.Y, -math.huge, -FALL_VELOCITY_THRESHOLD))
 
 	local crouchingRatio = math.clamp(
 		math.floor(velocityXZ.Magnitude / GlobalInfo.MOVEMENT.SPEED.CROUCHING * 100) / 100,
@@ -90,26 +94,32 @@ RunService.Heartbeat:Connect(function()
 		GlobalInfo.MOVEMENT.SPEED.RUNNING
 	)
 
-	if walkingRatio >= 1.1 then -- running
-		loadedAnimations.Run:AdjustWeight(runningRatio)
+	if not crouching and walkingRatio >= 1.1 then -- running
+		loadedAnimations.Run:AdjustWeight(math.clamp(runningRatio, ALMOST_ZERO, 1))
 		loadedAnimations.Walk:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.CrouchWalk:AdjustWeight(ALMOST_ZERO)
+	elseif crouching then --crouching
+		loadedAnimations.CrouchWalk:AdjustWeight(math.clamp(crouchingRatio, ALMOST_ZERO, 1))
+		loadedAnimations.Walk:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.Run:AdjustWeight(ALMOST_ZERO)
 	else -- walking
-		loadedAnimations.Walk:AdjustWeight(walkingRatio)
-		loadedAnimations.Run:AdjustWeight(ALMOST_ZERO, 0.5)
+		loadedAnimations.Walk:AdjustWeight(math.clamp(walkingRatio, ALMOST_ZERO, 1))
+		loadedAnimations.Run:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.CrouchWalk:AdjustWeight(ALMOST_ZERO)
 	end
 
 	--idle
-	if crouching then
+	if crouching then --crouchIdle
 		loadedAnimations.CrouchIdle:AdjustWeight(math.clamp(1 - crouchingRatio, ALMOST_ZERO, 1))
-		loadedAnimations.Idle:AdjustWeight(0)
-	else -- regular
-		loadedAnimations.Idle:AdjustWeight(math.clamp(1 - walkingRatio, ALMOST_ZERO, 1))
-		loadedAnimations.CrouchIdle:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.Idle:AdjustWeight(ALMOST_ZERO)
+	else -- regularIdle
+		loadedAnimations.Idle:AdjustWeight(math.clamp(1 - walkingRatio, ALMOST_ZERO, 1), 0.3)
+		loadedAnimations.CrouchIdle:AdjustWeight(ALMOST_ZERO, 0.3)
 	end
 
-	--loadedAnimations.Fall:AdjustWeight(math.clamp( velocity.Y, ALMOST_ZERO, 1))
+	loadedAnimations.Fall:AdjustWeight(math.clamp(isFalling, ALMOST_ZERO, 2))
+end)
 
-	loadedAnimations.CrouchIdle:AdjustWeight(ALMOST_ZERO)
-	loadedAnimations.CrouchWalk:AdjustWeight(ALMOST_ZERO)
-	loadedAnimations.Fall:AdjustWeight(ALMOST_ZERO)
+RedEvents.Signal.Client.WalkState:Connect(function(state: "Crouch" | "Walk" | "Sprint")
+	crouching = (state == "Crouch")
 end)

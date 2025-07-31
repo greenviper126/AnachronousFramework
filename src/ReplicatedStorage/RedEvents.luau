@@ -71,6 +71,7 @@ local fromSignalClient = {
 
 	Flashlight = Signal(), --
 	FootStep = Signal(), --isRightFoot Boolean
+	WalkState = Signal(), --state ("Crouch" | "Walk" | "Sprint")
 }
 
 --[[system connections]]
@@ -121,7 +122,6 @@ local function ConnectClientSystem(class: string)
 			if newClass ~= class or newName ~= name then
 				return
 			end
-
 			fromSignalClient.SystemResponse:Fire(class, name, signal(...))
 		end)
 
