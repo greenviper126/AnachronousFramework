@@ -1,5 +1,6 @@
 --!strict
 
+local CollectionService = game:GetService("CollectionService")
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -70,6 +71,34 @@ function Light.new()
 end
 
 --[[
+	Turns off light for fake flashlight.
+]]
+function Light.DisableFakeLight()
+	if not player.Character then
+		return
+	end
+
+	local lights = CollectionService:GetTagged("FakePlayerLight")
+
+	local foundFakeLight = false
+
+	for _, light: SpotLight in pairs(lights) do
+		local newCharacter = light:FindFirstAncestorOfClass("Model")
+		if newCharacter and newCharacter.Name == player.character.Name then
+			foundFakeLight = true
+
+			light.Enabled = false
+			break
+		end
+	end
+
+	if not foundFakeLight then
+		task.wait() --prevent crashing
+		Light.DisableFakeLight()
+	end
+end
+
+--[[
 	Turn the Flashlight on and off directly.
 
 	@param self Light - object
@@ -80,6 +109,13 @@ function Light.On(self: Light, on: boolean)
 	self.light2.Enabled = on
 
 	player:SetAttribute("_LightIsOn", on)
+
+	--for putting flashlight in players hand
+	RedEvents.Network.Client.FlashlightState:FireServer(on)
+
+	if on then
+		task.spawn(Light.DisableFakeLight)
+	end
 end
 
 --[[

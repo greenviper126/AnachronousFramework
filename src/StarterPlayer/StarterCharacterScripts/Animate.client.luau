@@ -10,6 +10,9 @@ export type animations<T> = {
 	Fall: T,
 	CrouchWalk: T,
 	CrouchIdle: T,
+
+	Flashlight: T,
+	FlashlightCrouched: T,
 }
 
 local Players = game:GetService("Players")
@@ -35,6 +38,9 @@ local animNames: animations<number> = {
 	Fall = 507767968,
 	CrouchWalk = 119591081252846,
 	CrouchIdle = 102924379198805,
+
+	Flashlight = 73594417373023,
+	FlashlightCrouched = 103702650337875,
 }
 
 local animationPriority: animations<Enum.AnimationPriority> = {
@@ -44,6 +50,9 @@ local animationPriority: animations<Enum.AnimationPriority> = {
 	Fall = Enum.AnimationPriority.Movement,
 	CrouchWalk = Enum.AnimationPriority.Movement,
 	CrouchIdle = Enum.AnimationPriority.Idle,
+
+	Flashlight = Enum.AnimationPriority.Action,
+	FlashlightCrouched = Enum.AnimationPriority.Action,
 }
 
 local function newAnimation(name: string, id: number): Animation
@@ -115,6 +124,20 @@ RunService.Heartbeat:Connect(function()
 	else -- regularIdle
 		loadedAnimations.Idle:AdjustWeight(math.clamp(1 - walkingRatio, ALMOST_ZERO, 1), 0.3)
 		loadedAnimations.CrouchIdle:AdjustWeight(ALMOST_ZERO, 0.3)
+	end
+
+	--flashlight
+	if player:GetAttribute("_LightIsOn") then
+		if crouching then
+			loadedAnimations.FlashlightCrouched:AdjustWeight(1)
+			loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO)
+		else
+			loadedAnimations.Flashlight:AdjustWeight(1)
+			loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO)
+		end
+	else
+		loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO)
 	end
 
 	loadedAnimations.Fall:AdjustWeight(math.clamp(isFalling, ALMOST_ZERO, 2))

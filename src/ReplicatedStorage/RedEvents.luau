@@ -16,6 +16,7 @@ local Signal = require(ReplicatedStorage.Packages._Index["red-blox_signal@2.0.2"
 
 --fired from server
 local fromNetworkServer = {
+
 	RoleCredits = Red.SharedSignalEvent("RoleCredits", function()
 		return nil
 	end),
@@ -33,6 +34,10 @@ local fromNetworkServer = {
 
 --fired from client
 local fromNetworkClient = {
+	FlashlightState = Red.SharedSignalEvent("FlashlightState", function(on)
+		return Guard.Boolean(on)
+	end),
+
 	Respawn = Red.SharedSignalEvent("Respawn", function()
 		return nil
 	end),
@@ -69,7 +74,6 @@ local fromSignalClient = {
 	SystemResponse = Signal(),
 	SystemSignal = Signal(),
 
-	Flashlight = Signal(), --
 	FootStep = Signal(), --isRightFoot Boolean
 	WalkState = Signal(), --state ("Crouch" | "Walk" | "Sprint")
 }
