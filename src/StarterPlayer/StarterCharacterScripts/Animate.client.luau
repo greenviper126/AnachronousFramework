@@ -11,6 +11,9 @@ export type animations<T> = {
 	CrouchWalk: T,
 	CrouchIdle: T,
 
+	TurningRight: T,
+	TurningLeft: T,
+
 	Flashlight: T,
 	FlashlightCrouched: T,
 }
@@ -39,6 +42,9 @@ local animNames: animations<number> = {
 	CrouchWalk = 119591081252846,
 	CrouchIdle = 102924379198805,
 
+	TurningRight = 83787355672024,
+	TurningLeft = 133981537596059,
+
 	Flashlight = 73594417373023,
 	FlashlightCrouched = 103702650337875,
 }
@@ -51,6 +57,9 @@ local animationPriority: animations<Enum.AnimationPriority> = {
 
 	CrouchWalk = Enum.AnimationPriority.Movement,
 	CrouchIdle = Enum.AnimationPriority.Idle,
+
+	TurningRight = Enum.AnimationPriority.Movement,
+	TurningLeft = Enum.AnimationPriority.Movement,
 
 	Flashlight = Enum.AnimationPriority.Action,
 	FlashlightCrouched = Enum.AnimationPriority.Action,
@@ -83,9 +92,20 @@ for name, id in pairs(animNames) do
 end
 
 --run and walk and crouch animation
+local turnGoal = 0
 RunService.Heartbeat:Connect(function()
 	local velocity = root.AssemblyLinearVelocity
 	local velocityXZ = Vector3.new(velocity.X, 0, velocity.Z)
+
+	local rotationVelocityIsNAN = root.AssemblyAngularVelocity ~= root.AssemblyAngularVelocity
+	local rotateVelocity = rotationVelocityIsNAN and Vector3.zero or root.AssemblyAngularVelocity
+
+	local turnVelocityIsNAN = rotateVelocity.Unit.Y ~= rotateVelocity.Unit.Y
+	local turnVelocity = turnVelocityIsNAN and 0 or rotateVelocity.Unit.Y
+	if math.abs(turnVelocity) < 0.25 then
+		turnVelocity = 0
+	end
+
 	local isFalling = -(FALL_VELOCITY_THRESHOLD + math.clamp(velocity.Y, -math.huge, -FALL_VELOCITY_THRESHOLD))
 
 	local crouchingRatio = math.clamp(
@@ -117,6 +137,11 @@ RunService.Heartbeat:Connect(function()
 		loadedAnimations.Run:AdjustWeight(ALMOST_ZERO)
 		loadedAnimations.CrouchWalk:AdjustWeight(ALMOST_ZERO)
 	end
+
+	--turning
+	turnGoal = math.sin(math.clamp(turnGoal + turnVelocity, -1, 1)) * 0.9
+	loadedAnimations.TurningLeft:AdjustWeight(math.clamp(turnGoal, ALMOST_ZERO, 1))
+	loadedAnimations.TurningRight:AdjustWeight(math.clamp(-turnGoal, ALMOST_ZERO, 1))
 
 	--idle
 	if crouching then --crouchIdle
