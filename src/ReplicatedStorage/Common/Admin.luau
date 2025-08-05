@@ -18,7 +18,7 @@ Admin.IDs = {
 	@return boolean - was that id an admin?
 ]]
 function Admin.IsAdmin(id: number): boolean
-	local isRegular = Players:GetAttribute("AdminIsRegularPlayer") and RunService:IsStudio() --only for studio testing
+	local isRegular = Players:GetAttribute("AdminIsRegularPlayer") and RunService:IsStudio() --only for studio testing.
 	local existsOnLookup = table.find(Admin.IDs, id) ~= nil
 
 	if not isRegular and existsOnLookup then
