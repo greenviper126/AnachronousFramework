@@ -2,6 +2,7 @@
 
 local FLASHLIGHT_ASSET_ID = 136192578782497
 local FAKE_FLASHLIGHT_ASSET_ID = 82091015194276
+local FAKE_GOLD_FLASHLIGHT_ASSET_ID = 127903740994664
 
 local InsertService = game:GetService("InsertService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -26,4 +27,5 @@ end
 return function()
 	loadTo(FLASHLIGHT_ASSET_ID, playerFlashlight) -- player flashlight
 	loadTo(FAKE_FLASHLIGHT_ASSET_ID, playerFlashlight) -- fake player flashlight (3rd person)
+	loadTo(FAKE_GOLD_FLASHLIGHT_ASSET_ID, playerFlashlight) -- fake player gamepass flashlight (3rd person)
 end

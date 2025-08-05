@@ -37,7 +37,7 @@ RunService.RenderStepped:Connect(function(delta: number)
 	end
 
 	-- for looking up and down
-	local theta = math.asin(camera.CFrame.LookVector.y)
+	local theta = math.clamp(math.asin(camera.CFrame.LookVector.y), -1.2, 1.2)
 
 	-- -- this is for rotating the waist
 	-- local rotationVelocity = -math.sin(root.AssemblyAngularVelocity.Unit.Y) * GlobalInfo.MOVEMENT.TRACKING.TURN_STRENGTH
@@ -51,11 +51,7 @@ RunService.RenderStepped:Connect(function(delta: number)
 	-- 	currentWaistRotation = currentWaistRotation * 0.95
 	-- end
 
-	local velocityIsNAN = false --weird issues happen without this
-	if root.AssemblyAngularVelocity ~= root.AssemblyAngularVelocity then
-		velocityIsNAN = true
-	end
-
+	local velocityIsNAN = root.AssemblyAngularVelocity ~= root.AssemblyAngularVelocity --weird issues happen without this
 	if not velocityIsNAN and math.abs(root.AssemblyAngularVelocity.Unit.Y) < 0.1 then
 		prevRotation = prevRotation * 0.5
 	end

@@ -48,6 +48,7 @@ local animationPriority: animations<Enum.AnimationPriority> = {
 	Walk = Enum.AnimationPriority.Movement,
 	Run = Enum.AnimationPriority.Movement,
 	Fall = Enum.AnimationPriority.Movement,
+
 	CrouchWalk = Enum.AnimationPriority.Movement,
 	CrouchIdle = Enum.AnimationPriority.Idle,
 
@@ -129,15 +130,15 @@ RunService.Heartbeat:Connect(function()
 	--flashlight
 	if player:GetAttribute("_LightIsOn") then
 		if crouching then
-			loadedAnimations.FlashlightCrouched:AdjustWeight(1)
-			loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO)
+			loadedAnimations.FlashlightCrouched:AdjustWeight(0.98, 0.2)
+			loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO, 0.2)
 		else
-			loadedAnimations.Flashlight:AdjustWeight(1)
-			loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO)
+			loadedAnimations.Flashlight:AdjustWeight(0.98, 0.2)
+			loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO, 0.2)
 		end
 	else
-		loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO)
-		loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO)
+		loadedAnimations.Flashlight:AdjustWeight(ALMOST_ZERO, 0.2)
+		loadedAnimations.FlashlightCrouched:AdjustWeight(ALMOST_ZERO, 0.2)
 	end
 
 	loadedAnimations.Fall:AdjustWeight(math.clamp(isFalling, ALMOST_ZERO, 2))

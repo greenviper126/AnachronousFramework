@@ -37,7 +37,11 @@
       "$className": "Players",
       "$properties": {
         "CharacterAutoLoads": true,
-        "UseStrafingAnimations": false
+        "UseStrafingAnimations": false,
+
+        "Attributes": {
+			    "AdminIsRegularPlayer": {"Bool": true}
+		    }
       }
     },
 

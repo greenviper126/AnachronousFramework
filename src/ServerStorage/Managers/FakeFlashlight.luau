@@ -3,9 +3,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Market = require(ReplicatedStorage.Common.Market)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local fakeFlashlight = ReplicatedStorage.PlayerFlashlight:WaitForChild("FakeFlashlight") :: Part
+local fakeGoldFlashlight = ReplicatedStorage.PlayerFlashlight:WaitForChild("FakeGoldFlashlight") :: Part
 
 local function SetFlashlight(player: Player, character: Model)
 	local leftHand = character:WaitForChild("LeftHand") :: BasePart
@@ -21,7 +23,9 @@ local function SetFlashlight(player: Player, character: Model)
 	local function createFlashlight()
 		removeFlashlight()
 
-		local newFakeFlashlight = fakeFlashlight:Clone()
+		local hasFlashlightGamepass = Market.PlayerOwnsGamepass(player.UserId, Market.Id.GamePasses.BetterFlashlight)
+
+		local newFakeFlashlight = hasFlashlightGamepass and fakeGoldFlashlight:Clone() or fakeFlashlight:Clone()
 		newFakeFlashlight:PivotTo(attachment.WorldCFrame * CFrame.new(0.2, 0, 0) * CFrame.Angles(math.rad(-90), 0, 0))
 		newFakeFlashlight.Parent = leftHand
 		currentLight = newFakeFlashlight

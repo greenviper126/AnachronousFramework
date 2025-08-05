@@ -347,10 +347,6 @@ function Stamina.Track(self: Stamina)
 			self.requestingCrouch = false
 		end
 
-		if self.requestingSprint then
-			self.requestingCrouch = false
-		end
-
 		if not self.requestingSprint or self.reachedBottom then
 			self:Regen()
 		else
@@ -376,6 +372,10 @@ function Stamina.ConnectKey(self: Stamina)
 	local function activatedStamina(_actionName: string, inputState: Enum.UserInputState, _inputObject: InputObject)
 		if inputState == Enum.UserInputState.End then
 			self.requestingSprint = false
+			return Enum.ContextActionResult.Pass
+		end
+
+		if self.requestingCrouch then
 			return Enum.ContextActionResult.Pass
 		end
 
@@ -409,6 +409,10 @@ function Stamina.ConnectKey(self: Stamina)
 	--crouch
 	local function activatedCrouch(_actionName: string, inputState: Enum.UserInputState, _inputObject: InputObject)
 		if inputState == Enum.UserInputState.End then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if self.requestingSprint then
 			return Enum.ContextActionResult.Pass
 		end
 

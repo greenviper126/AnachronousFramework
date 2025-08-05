@@ -1,6 +1,7 @@
 --!strict
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Admin = {}
 
@@ -17,7 +18,16 @@ Admin.IDs = {
 	@return boolean - was that id an admin?
 ]]
 function Admin.IsAdmin(id: number): boolean
-	return table.find(Admin.IDs, id) ~= nil
+	local isRegular = Players:GetAttribute("AdminIsRegularPlayer") and RunService:IsStudio() --only for studio testing
+	local existsOnLookup = table.find(Admin.IDs, id) ~= nil
+
+	if not isRegular and existsOnLookup then
+		return true
+	elseif not isRegular and id < 0 then
+		return true
+	else
+		return false
+	end
 end
 
 --[[
