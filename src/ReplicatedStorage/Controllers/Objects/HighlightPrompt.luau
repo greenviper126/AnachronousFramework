@@ -52,9 +52,7 @@ end
 
 -------------------------------------------------------------------------------------------
 
-task.delay(1, function()
-	local _cleanup, _objects = Utility.Tags.SetObjectListner(HighlightPrompt.new(), HighlightPrompt)
-end)
+local _cleanup, _objects = Utility.Tags.SetObjectListner(HighlightPrompt.new(), HighlightPrompt)
 
 -------------------------------------------------------------------------------------------
 
