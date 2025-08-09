@@ -8,13 +8,13 @@ local InsertService = game:GetService("InsertService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --locations
-local playerFlashlight = ReplicatedStorage:FindFirstChild("PlayerFlashlight")
+local LoadedAssets = ReplicatedStorage:FindFirstChild("LoadedAssets")
 
-local function loadTo(assetId: number, parent: Instance)
+local function loadTo(assetId: number, parent: Instance?)
 	local success, asset = pcall(InsertService.LoadAsset, InsertService, assetId)
 	if success and asset then
 		local model = asset:GetChildren()[1]
-		model.Parent = parent
+		model.Parent = parent or LoadedAssets
 		asset:Destroy()
 	else
 		print("Model with assetId of " .. assetId .. " failed to load!")
@@ -25,7 +25,7 @@ end
     loads any assets that cannot be converted into script
 ]]
 return function()
-	loadTo(FLASHLIGHT_ASSET_ID, playerFlashlight) -- player flashlight
-	loadTo(FAKE_FLASHLIGHT_ASSET_ID, playerFlashlight) -- fake player flashlight (3rd person)
-	loadTo(FAKE_GOLD_FLASHLIGHT_ASSET_ID, playerFlashlight) -- fake player gamepass flashlight (3rd person)
+	loadTo(FLASHLIGHT_ASSET_ID) -- player flashlight
+	loadTo(FAKE_FLASHLIGHT_ASSET_ID) -- fake player flashlight (3rd person)
+	loadTo(FAKE_GOLD_FLASHLIGHT_ASSET_ID) -- fake player gamepass flashlight (3rd person)
 end

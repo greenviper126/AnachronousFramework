@@ -60,7 +60,7 @@
         "$path": "packages"
       },
 
-      "PlayerFlashlight": {
+      "LoadedAssets": {
         "$className": "Folder",
         "$ignoreUnknownInstances": true
       }

@@ -2,8 +2,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local playerFlashlight = ReplicatedStorage:WaitForChild("PlayerFlashlight", 4)
-local flashlight = playerFlashlight:FindFirstChild("flashlight")
+local LoadedAssets = ReplicatedStorage:WaitForChild("LoadedAssets")
+local flashlight = LoadedAssets:FindFirstChild("flashlight")
 
 --[[
 	having the light in all script doesn't seem to work

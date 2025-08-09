@@ -6,8 +6,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Market = require(ReplicatedStorage.Common.Market)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
-local fakeFlashlight = ReplicatedStorage.PlayerFlashlight:WaitForChild("FakeFlashlight") :: Part
-local fakeGoldFlashlight = ReplicatedStorage.PlayerFlashlight:WaitForChild("FakeGoldFlashlight") :: Part
+local LoadedAssets = ReplicatedStorage:FindFirstChild("LoadedAssets")
+
+local fakeFlashlight = LoadedAssets:WaitForChild("FakeFlashlight") :: Part
+local fakeGoldFlashlight = LoadedAssets:WaitForChild("FakeGoldFlashlight") :: Part
 
 local function SetFlashlight(player: Player, character: Model)
 	local leftHand = character:WaitForChild("LeftHand") :: BasePart

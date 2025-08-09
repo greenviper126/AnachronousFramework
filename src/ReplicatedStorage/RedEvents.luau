@@ -185,6 +185,7 @@ local RedSignalNetwork = {
 		Server = fromSignalServer,
 		Client = fromSignalClient,
 	},
+	--prevent cyclic dependencies
 	SystemConnect = {
 		FireClient = FireClientSystem,
 		ConnectClient = ConnectClientSystem,
