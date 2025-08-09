@@ -18,7 +18,8 @@ HighlightHover.__index = HighlightHover
 HighlightHover.TAG_NAME = "Highlight"
 
 type self = {
-	base: BasePart,
+	base: Instance,
+
 	highlights: { Highlight },
 
 	_cleaner: typeof(Trove.new()),
@@ -26,13 +27,13 @@ type self = {
 
 export type HighlightHover = typeof(setmetatable({} :: self, HighlightHover))
 
-function HighlightHover.new(base: BasePart?)
-	if not base then
-		return
-	end
-
+function HighlightHover.new(base: Instance?)
 	local self = setmetatable({} :: self, HighlightHover)
 	self._cleaner = Trove.new()
+
+	if not base then --helps with types
+		return self
+	end
 
 	self.base = base
 
@@ -44,8 +45,6 @@ function HighlightHover.new(base: BasePart?)
 end
 
 function HighlightHover._init(self: HighlightHover)
-	local index = 0
-
 	local function AddHighlight(inst: BasePart)
 		if not inst:IsA("BasePart") then
 			return
@@ -70,8 +69,9 @@ function HighlightHover._init(self: HighlightHover)
 		table.insert(self.highlights, highlight)
 	end
 
-	if self.base:FindFirstAncestorWhichIsA("BasePart") then
-		for _, inst in pairs(self.base:GetChildren()) do
+	local function getHighlights(Instances: { Instance })
+		local index = 0
+		for _, inst in pairs(Instances) do
 			if not inst:IsA("BasePart") then
 				continue
 			end
@@ -84,7 +84,19 @@ function HighlightHover._init(self: HighlightHover)
 
 			AddHighlight(inst)
 		end
-	else
+	end
+
+	local basePart = self.base:IsA("BasePart") and self.base or self.base:FindFirstAncestorWhichIsA("BasePart")
+
+	if basePart then
+		local hasBasePartChildren = basePart:FindFirstChildWhichIsA("BasePart", true)
+		if hasBasePartChildren then
+			getHighlights(basePart:GetChildren())
+		else
+			AddHighlight(basePart)
+		end
+	end
+	if self.base:IsA("BasePart") then
 		AddHighlight(self.base)
 	end
 
@@ -101,6 +113,12 @@ function HighlightHover._init(self: HighlightHover)
 	setProperties()
 	self._cleaner:Connect(self.base.AttributeChanged, function()
 		setProperties()
+	end)
+
+	self._cleaner:Add(function() --remove all highlight attributes when cleaning up
+		for k, _ in pairs(Utility.Properties.InstanceToProperties(self.base)) do
+			self.base:SetAttribute("HighlightPrompt" .. k, nil)
+		end
 	end)
 end
 
@@ -130,19 +148,21 @@ receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): 
 	local base = parent:IsA("BasePart") and parent or parent:FindFirstAncestorWhichIsA("BasePart")
 
 	if base then
-		base:AddTag("Highlight")
+		local self = HighlightHover.new(prompt)
+		cleaner:Add(function()
+			self:Cleanup()
+		end)
 
 		cleaner:Connect(prompt.PromptShown, function()
-			base:SetAttribute("HighlightPromptEnabled", true)
+			prompt:SetAttribute("HighlightPromptEnabled", true)
 		end)
 
 		cleaner:Connect(prompt.PromptHidden, function()
-			base:SetAttribute("HighlightPromptEnabled", false)
+			prompt:SetAttribute("HighlightPromptEnabled", false)
 		end)
 
 		cleaner:Add(function()
-			base:RemoveTag("Highlight")
-			base:SetAttribute("HighlightPromptEnabled", nil)
+			prompt:SetAttribute("HighlightPromptEnabled", nil)
 		end)
 	else
 		warn("Could not find base to attach HighlightPrompt, Parent: " .. parent:GetFullName())

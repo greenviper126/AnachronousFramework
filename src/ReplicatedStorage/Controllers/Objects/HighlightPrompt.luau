@@ -58,6 +58,12 @@ function HighlightPrompt.new(base: (BasePart | Attachment)?)
 		setProperties()
 	end)
 
+	self._cleaner:Add(function() --remove all highlight attributes when cleaning up
+		for k, _ in pairs(Utility.Properties.InstanceToProperties(self.prompt)) do
+			self.base:SetAttribute("Prompt" .. k, nil)
+		end
+	end)
+
 	return self
 end
 
