@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	This may just be more used for testing Highlights as I don't see many uses for this in the real game.
+]]
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Trove = require(ReplicatedStorage.Packages.trove)
@@ -15,6 +19,8 @@ HighlightPrompt.TAG_NAME = "HighlightPrompt"
 type self = {
 	base: Instance,
 	root: BasePart,
+
+	prompt: ProximityPrompt,
 
 	_cleaner: typeof(Trove.new()),
 }
@@ -36,7 +42,21 @@ function HighlightPrompt.new(base: (BasePart | Attachment)?)
 
 	self.base = base
 
-	self._cleaner:Add(HighlightUtility.CreateHighlightPrompt(base))
+	self.prompt = self._cleaner:Add(HighlightUtility.CreateHighlightPrompt(base))
+
+	local function setProperties()
+		for k, v in pairs(Utility.Properties.AttributesToProperties(self.base)) do
+			pcall(function()
+				local prompt = self.prompt :: any --fix type error
+				prompt[k:gsub("Prompt", "")] = v
+			end)
+		end
+	end
+
+	setProperties()
+	self._cleaner:Connect(self.base.AttributeChanged, function()
+		setProperties()
+	end)
 
 	return self
 end

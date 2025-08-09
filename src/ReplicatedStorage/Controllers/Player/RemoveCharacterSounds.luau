@@ -31,12 +31,12 @@ local function removeRootSounds(player: Player)
 	end)
 end
 
-for _, player in pairs(Players:GetPlayers()) do
-	removeRootSounds(player)
-end
+-- for _, player in pairs(Players:GetPlayers()) do
+-- 	removeRootSounds(player)
+-- end
 
-Players.PlayerAdded:Connect(function(player: Player)
-	removeRootSounds(player)
-end)
+-- Players.PlayerAdded:Connect(function(player: Player)
+-- 	removeRootSounds(player)
+-- end)
 
 return {}
