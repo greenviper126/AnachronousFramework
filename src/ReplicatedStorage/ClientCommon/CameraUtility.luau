@@ -27,10 +27,8 @@ function cameraUtility.GetFirstPerson(): boolean
 end
 
 --[[
-    Connect a function to the FirstPerson camera type
-	
-	Will run when the character dies or the camera type was switched to unlock
-
+    Connect a function to the FirstPerson camera type.
+    Will run when the character dies or the camera type was switched to unlock.
     @param func () -> () - function you want to run
 ]]
 function cameraUtility.ConnectFunctionToFirstPersonType(func: () -> ())
@@ -38,12 +36,11 @@ function cameraUtility.ConnectFunctionToFirstPersonType(func: () -> ())
 end
 
 --[[
-    Connect a function to the FirstPerson camera type to run while in first person
-	
-	Cleanup function will run when the character dies or the camera type was switched to unlock
+    Connect a function to the FirstPerson camera type to run while in first person.
+    Cleanup function will run when the character dies or the camera type was switched to unlock.
 
     @param run () -> () - function you want to run in first person
-	@param cleanup () -> () - function you want to cleanup the run
+    @param cleanup () -> () - function you want to cleanup the run
 ]]
 function cameraUtility.ConnectAndListenToFirstPersonType(run: () -> (), cleanup: () -> ())
 	sendSignal("ConnectFunctionToFirstPersonType", run, cleanup)

@@ -293,7 +293,6 @@ end)
 
 receiveSignal("ConnectFunctionToFirstPersonType", function(func: () -> ())
 	if not _uniqueClass then
-		print(1)
 		return
 	end
 

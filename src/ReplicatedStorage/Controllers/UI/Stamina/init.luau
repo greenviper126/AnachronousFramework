@@ -23,7 +23,7 @@ local Sounds = require(ReplicatedStorage.Common.Sounds)
 
 local CameraBobbing = require(ReplicatedStorage.ClientCommon.CameraUtility)
 
-local StaminaUI = require(script.StaminaUI)
+local StaminaUI = require(script:WaitForChild("StaminaUI"))
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local camera = workspace.CurrentCamera
@@ -197,8 +197,8 @@ function Stamina.Regen(self: Stamina)
 		GlobalInfo.MOVEMENT.STAMINA.MAX_STAMINA
 	)
 
-	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.fromScale(self:GetStaminaPercentage(), 1) })
-		:Play()
+	local newScaleSize = UDim2.fromScale(self:GetStaminaPercentage(), 1)
+	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = newScaleSize }):Play()
 end
 
 --[[
@@ -231,8 +231,8 @@ function Stamina.Drain(self: Stamina)
 		GlobalInfo.MOVEMENT.STAMINA.MAX_STAMINA
 	)
 
-	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = UDim2.fromScale(self:GetStaminaPercentage(), 1) })
-		:Play()
+	local newScaleSize = UDim2.fromScale(self:GetStaminaPercentage(), 1)
+	TweenService:Create(self.staminaBar, TweenInfo.new(0.1), { Size = newScaleSize }):Play()
 end
 
 --[[
@@ -249,11 +249,10 @@ function Stamina.SetReachBottom(self: Stamina)
 		self.reachedBottom = false
 
 		if self.staminaBar.BackgroundColor3 == GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR then
-			TweenService:Create(
-				self.staminaBar,
-				TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.TIRED_TRANSITION_TIME, Enum.EasingStyle.Sine),
-				{ BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR }
-			):Play()
+			local tweenInfo = TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.TIRED_TRANSITION_TIME, Enum.EasingStyle.Sine)
+			local defaultBarColor = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR
+
+			TweenService:Create(self.staminaBar, tweenInfo, { BackgroundColor3 = defaultBarColor }):Play()
 		end
 	end
 end
@@ -267,26 +266,22 @@ function Stamina.SetFade(self: Stamina)
 	if not self.reachedTop and self:GetStaminaPercentage() == 1 then
 		self.reachedTop = true
 
-		TweenService:Create(
-			self.staminaHolder,
-			TweenInfo.new(
-				GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME,
-				Enum.EasingStyle.Sine,
-				Enum.EasingDirection.InOut,
-				0,
-				false,
-				GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_WAIT_TIME
-			),
-			{ GroupTransparency = 1 }
-		):Play()
+		local tweenInfo = TweenInfo.new(
+			GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME,
+			Enum.EasingStyle.Sine,
+			Enum.EasingDirection.InOut,
+			0,
+			false,
+			GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_WAIT_TIME
+		)
+
+		TweenService:Create(self.staminaHolder, tweenInfo, { GroupTransparency = 1 }):Play()
 	elseif self.reachedTop and self:GetStaminaPercentage() ~= 1 then
 		self.reachedTop = false
 
-		TweenService:Create(
-			self.staminaHolder,
-			TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME, Enum.EasingStyle.Sine),
-			{ GroupTransparency = 0 }
-		):Play()
+		local tweenInfo = TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.FULL_STAMIN_FADE_TIME, Enum.EasingStyle.Sine)
+
+		TweenService:Create(self.staminaHolder, tweenInfo, { GroupTransparency = 0 }):Play()
 	end
 end
 
@@ -306,24 +301,20 @@ function Stamina.SetFOV(self: Stamina)
 		end
 		self.prevFovState = true
 
-		TweenService:Create(
-			camera,
-			TweenInfo.new(0.3, Enum.EasingStyle.Sine),
-			{ FieldOfView = GlobalInfo.CAMERA.DEFAULT_FOV + GlobalInfo.MOVEMENT.STAMINA.FOV_ZOOM_OUT }
-		):Play()
+		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Sine)
+		local fov = GlobalInfo.CAMERA.DEFAULT_FOV + GlobalInfo.MOVEMENT.STAMINA.FOV_ZOOM_OUT
+
+		TweenService:Create(camera, tweenInfo, { FieldOfView = fov }):Play()
 	else
 		if self.prevFovState == false then
 			return
 		end
 		self.prevFovState = false
 
-		TweenService
-			:Create(
-				camera,
-				TweenInfo.new(0.3, Enum.EasingStyle.Sine),
-				{ FieldOfView = GlobalInfo.CAMERA.DEFAULT_FOV + 0 }
-			)
-			:Play()
+		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Sine)
+		local fov = GlobalInfo.CAMERA.DEFAULT_FOV + 0
+
+		TweenService:Create(camera, tweenInfo, { FieldOfView = fov }):Play()
 	end
 end
 
