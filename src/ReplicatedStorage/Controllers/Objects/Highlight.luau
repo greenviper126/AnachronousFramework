@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Highlights objects using proximity prompts
+]]
+
 local OBJECT_HIGHLIGHT_LIMIT = 15
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,7 +18,8 @@ HighlightHover.__index = HighlightHover
 HighlightHover.TAG_NAME = "Highlight"
 
 type self = {
-	base: BasePart,
+	base: Instance,
+
 	highlights: { Highlight },
 
 	_cleaner: typeof(Trove.new()),
@@ -22,13 +27,13 @@ type self = {
 
 export type HighlightHover = typeof(setmetatable({} :: self, HighlightHover))
 
-function HighlightHover.new(base: BasePart?)
-	if not base then
-		return
-	end
-
+function HighlightHover.new(base: Instance?)
 	local self = setmetatable({} :: self, HighlightHover)
 	self._cleaner = Trove.new()
+
+	if not base then --helps with types
+		return self
+	end
 
 	self.base = base
 
@@ -40,30 +45,23 @@ function HighlightHover.new(base: BasePart?)
 end
 
 function HighlightHover._init(self: HighlightHover)
-	local index = 0
-
-	for _, inst in pairs(self.base:GetChildren()) do
-		index += 1
-
-		if index > OBJECT_HIGHLIGHT_LIMIT then
-			break
-		end
-
+	local function AddHighlight(inst: BasePart)
 		if not inst:IsA("BasePart") then
-			continue
+			return
 		end
 		if inst.Name == "NoHighlight" then
-			continue
+			return
 		end --will not highlight anything with this name
 		if inst:GetAttribute("NoHighlight") then
-			continue
+			return
 		end --will not highlight anything with this attribute
 
 		local highlight = self._cleaner:Add(Instance.new("Highlight"))
 		highlight.Adornee = inst
+		highlight.DepthMode = Enum.HighlightDepthMode.Occluded
 		highlight.OutlineColor = Color3.new(1, 1, 1)
 		highlight.FillColor = Color3.new(1, 1, 1)
-		highlight.OutlineTransparency = 0.2
+		highlight.OutlineTransparency = 0.4
 		highlight.FillTransparency = 0.8
 		highlight.Enabled = false
 		highlight.Parent = inst
@@ -71,11 +69,42 @@ function HighlightHover._init(self: HighlightHover)
 		table.insert(self.highlights, highlight)
 	end
 
+	local function getHighlights(Instances: { Instance })
+		local index = 0
+		for _, inst in pairs(Instances) do
+			if not inst:IsA("BasePart") then
+				continue
+			end
+
+			index += 1
+
+			if index > OBJECT_HIGHLIGHT_LIMIT then
+				break
+			end
+
+			AddHighlight(inst)
+		end
+	end
+
+	local basePart = self.base:IsA("BasePart") and self.base or self.base:FindFirstAncestorWhichIsA("BasePart")
+
+	if basePart then
+		local hasBasePartChildren = basePart:FindFirstChildWhichIsA("BasePart", true)
+		if hasBasePartChildren then
+			getHighlights(basePart:GetChildren())
+		else
+			AddHighlight(basePart)
+		end
+	end
+	if self.base:IsA("BasePart") then
+		AddHighlight(self.base)
+	end
+
 	local function setProperties()
 		for k, v in pairs(Utility.Properties.AttributesToProperties(self.base)) do
 			pcall(function()
 				for _, highlight: any in pairs(self.highlights) do
-					highlight[k] = v
+					highlight[k:gsub("HighlightPrompt", "")] = v
 				end
 			end)
 		end
@@ -84,6 +113,12 @@ function HighlightHover._init(self: HighlightHover)
 	setProperties()
 	self._cleaner:Connect(self.base.AttributeChanged, function()
 		setProperties()
+	end)
+
+	self._cleaner:Add(function() --remove all highlight attributes when cleaning up
+		for k, _ in pairs(Utility.Properties.InstanceToProperties(self.base)) do
+			self.base:SetAttribute("HighlightPrompt" .. k, nil)
+		end
 	end)
 end
 
@@ -104,6 +139,8 @@ receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): 
 	local cleaner = Trove.new()
 
 	local prompt = Instance.new("ProximityPrompt")
+	prompt.Style = Enum.ProximityPromptStyle.Custom
+	prompt.RequiresLineOfSight = true
 	prompt.Parent = parent
 
 	cleaner:AttachToInstance(prompt)
@@ -111,14 +148,21 @@ receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): 
 	local base = parent:IsA("BasePart") and parent or parent:FindFirstAncestorWhichIsA("BasePart")
 
 	if base then
-		base:AddTag("Highlight")
+		local self = HighlightHover.new(prompt)
+		cleaner:Add(function()
+			self:Cleanup()
+		end)
 
 		cleaner:Connect(prompt.PromptShown, function()
-			base:SetAttribute("Enabled", true)
+			prompt:SetAttribute("HighlightPromptEnabled", true)
 		end)
 
 		cleaner:Connect(prompt.PromptHidden, function()
-			base:SetAttribute("Enabled", false)
+			prompt:SetAttribute("HighlightPromptEnabled", false)
+		end)
+
+		cleaner:Add(function()
+			prompt:SetAttribute("HighlightPromptEnabled", nil)
 		end)
 	else
 		warn("Could not find base to attach HighlightPrompt, Parent: " .. parent:GetFullName())

@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	For loading almost everything in the game.
+]]
+
 local RunService = game:GetService("RunService")
 
 local assetsLoader = require(script.AssetLoader)
@@ -35,7 +39,7 @@ local function LoadFromFile(file: Instance)
 
 					if not success then
 						fileRead = fileRead .. "\t" .. v.Name .. " ERROR \n"
-						warn(v.Name .. " module did not load correctly!")
+						warn(v.Name .. " module did not load correctly, Error: ", result)
 					else
 						fileRead = fileRead .. "\t" .. v.Name .. "\n"
 						table.insert(_files, result)
