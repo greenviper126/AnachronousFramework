@@ -2,7 +2,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Admin = require(ReplicatedStorage.Common.Admin)
+local Admin = require(ReplicatedStorage.Admin)
 
 return function(registry)
 	registry:RegisterHook("BeforeRun", function(context)

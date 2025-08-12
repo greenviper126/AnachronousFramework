@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
-local sendSignal = RedEvents.SystemConnect.FireClient("Mouse")
+local sendSignal = RedEvents.SystemConnect.CreateSender("Mouse")
 
 local mouseUtility = {}
 

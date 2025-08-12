@@ -281,7 +281,7 @@ end)
 
 -------------------------------------------------------------------------------------------
 
-local receiveSignal = RedEvents.SystemConnect.ConnectClient("CameraBobbing")
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("CameraBobbing")
 
 receiveSignal("SetFirstPerson", function(set)
 	player:SetAttribute("IsFirstPerson", set)

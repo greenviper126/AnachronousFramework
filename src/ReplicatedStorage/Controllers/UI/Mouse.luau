@@ -41,7 +41,7 @@ RunService.PreRender:Connect(function()
 	UserInputService.MouseIconEnabled = false --this should never appear
 end)
 
-local receiveSignal = RedEvents.SystemConnect.ConnectClient("Mouse")
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("Mouse")
 
 receiveSignal("SetImage", function(imageID: number?)
 	dot.Image = "rbxassetid://" .. (imageID or DEFAULT_MOUSE_IMAGE)

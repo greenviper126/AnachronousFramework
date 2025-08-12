@@ -453,7 +453,7 @@ local _uniqueClass = Utility.Tags.GetUniqueClass(Stamina.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
-local receiveSignal = RedEvents.SystemConnect.ConnectClient("Stamina")
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("Stamina")
 
 receiveSignal("SetCanSprint", function(activate: boolean)
 	canSprint = activate

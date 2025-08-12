@@ -4,14 +4,14 @@
     Red library should only be called here
 ]]
 
-local STARTUP_WAIT_TIME = 4
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Guard = require(ReplicatedStorage.Packages._Index["red-blox_guard@1.0.1"].guard)
 local Ratelimit = require(ReplicatedStorage.Packages.ratelimit)
 local Red = require(ReplicatedStorage.Packages.red)
 local Signal = require(ReplicatedStorage.Packages._Index["red-blox_signal@2.0.2"].signal)
+
+local BindableFunction = require(script.BindableFunction)
 
 --[[network connections]]
 ----------------------------------------------------------------------------------------------------
@@ -56,6 +56,12 @@ local fromNetworkClient = {
 		end
 	),
 
+	IsAdmin = Red.Function("IsAdmin", function(playerId)
+		return Guard.Number(playerId)
+	end, function(result)
+		return Guard.Boolean(result)
+	end),
+
 	--unreliable
 	BodyCFrame = Red.SharedEvent({ --send character CFrame info to server
 		Name = "BodyCFrame",
@@ -73,96 +79,9 @@ local fromSignalServer = {}
 
 --client side
 local fromSignalClient = {
-	SystemResponse = Signal(),
-	SystemSignal = Signal(),
-
 	FootStep = Signal(), --isRightFoot Boolean
 	WalkState = Signal(), --state ("Crouch" | "Walk" | "Sprint")
 }
-
---[[system connections]]
-----------------------------------------------------------------------------------------------------
-
-local registeredFunctions = {}
-
---[[
-	Used for Global/Common Modules to prevent cyclic dependencies.
-
-	returns a function thats yielding
-]]
-local function FireClientSystem(class: string): (string, ...any) -> ...any
-	local function sendInfo(name: string, ...: any): ...any
-		local results = { "NoResult" }
-		local connection = fromSignalClient.SystemResponse:Connect(function(newClass: string, newName: string, ...: any)
-			if newClass ~= class or newName ~= name then
-				return
-			end
-
-			results = { ... }
-		end)
-
-		local function cleanup()
-			if connection then
-				connection()
-			end
-		end
-
-		local function functionExists(): boolean
-			return registeredFunctions[class] ~= nil and registeredFunctions[class][name] ~= nil
-		end
-
-		while not functionExists() do
-			task.wait()
-		end
-
-		fromSignalClient.SystemSignal:Fire(class, name, ...)
-
-		--took to long to send back
-		task.delay(10, function()
-			if results[1] == "NoResult" then
-				warn("System Signal not received, class: " .. class .. ", name: " .. name .. ", Input: ", results)
-				cleanup()
-			end
-		end)
-
-		repeat
-			task.wait()
-		until results[1] ~= "NoResult"
-
-		cleanup()
-
-		return table.unpack(results)
-	end
-
-	return sendInfo
-end
-
---[[
-	Used for Controller/Manager Modules to prevent cyclic dependencies.
-
-	does not yield
-]]
-local function ConnectClientSystem(class: string)
-	if not registeredFunctions[class] then
-		registeredFunctions[class] = {}
-	end
-
-	local function connectInfo(name: string, signal: (...any) -> ...any): () -> ()
-		registeredFunctions[class][name] = true
-
-		local cleanup = fromSignalClient.SystemSignal:Connect(function(newClass: string, newName: string, ...: any)
-			if newClass ~= class or newName ~= name then
-				return
-			end
-
-			fromSignalClient.SystemResponse:Fire(class, name, signal(...))
-		end)
-
-		return cleanup
-	end
-
-	return connectInfo
-end
 
 ----------------------------------------------------------------------------------------------------
 
@@ -187,8 +106,8 @@ local RedSignalNetwork = {
 	},
 	--prevent cyclic dependencies
 	SystemConnect = {
-		FireClient = FireClientSystem,
-		ConnectClient = ConnectClientSystem,
+		CreateSender = BindableFunction.FireSystem,
+		CreateReceiver = BindableFunction.ConnectSystem,
 	},
 	Ratelimit = Ratelimit,
 	NewSignal = Signal,

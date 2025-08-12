@@ -254,7 +254,7 @@ local _uniqueClass = Utility.Tags.GetUniqueClass(Light.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
-local receiveSignal = RedEvents.SystemConnect.ConnectClient("Flashlight")
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("Flashlight")
 
 receiveSignal("SetCanActivate", function(activate: boolean)
 	canActivate = activate

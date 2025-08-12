@@ -98,10 +98,9 @@ local _cleanup, _objects = Utility.Tags.SetObjectListner(HighlightHover.new(), H
 
 -------------------------------------------------------------------------------------------
 
-local receiveSignal = RedEvents.SystemConnect.ConnectClient("Highlight")
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("Highlight")
 
 receiveSignal("CreateHighlightPrompt", function(parent: BasePart | Attachment): ProximityPrompt
-	print("________________________", parent)
 	local cleaner = Trove.new()
 
 	local prompt = Instance.new("ProximityPrompt")

@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
-local sendSignal = RedEvents.SystemConnect.FireClient("CameraBobbing")
+local sendSignal = RedEvents.SystemConnect.CreateSender("CameraBobbing")
 
 local cameraUtility = {}
 

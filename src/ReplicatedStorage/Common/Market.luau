@@ -4,7 +4,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Admin = require(ReplicatedStorage.Common.Admin)
+local Admin = require(ReplicatedStorage.Admin)
 
 local Market = {}
 

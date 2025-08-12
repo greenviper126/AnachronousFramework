@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
-local sendSignal = RedEvents.SystemConnect.FireClient("Highlight")
+local sendSignal = RedEvents.SystemConnect.CreateSender("Highlight")
 
 --[[
     This is were you create highlight prompts
