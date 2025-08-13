@@ -6,6 +6,8 @@
 	anim will be connected through these signals
 ]]
 
+local UN_CROUCH_CHECK_DISTANCE = 2
+
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -319,6 +321,21 @@ function Stamina.SetFOV(self: Stamina)
 end
 
 --[[
+	Checks if player can unCrouch.
+
+	@param self Stamina - object
+]]
+function Stamina.CanUnCrouch(self: Stamina): boolean
+	local param = RaycastParams.new()
+	param.RespectCanCollide = false
+	param.FilterDescendantsInstances = { player.Character:GetDescendants() }
+
+	local ray = workspace:Raycast(self.root.Position, self.root.CFrame.UpVector * UN_CROUCH_CHECK_DISTANCE, param)
+
+	return ray == nil
+end
+
+--[[
 	Main loop
 
 	@param self Stamina - object
@@ -370,6 +387,10 @@ function Stamina.ConnectKey(self: Stamina)
 			return Enum.ContextActionResult.Pass
 		end
 
+		if not self:CanUnCrouch() then
+			return Enum.ContextActionResult.Pass
+		end
+
 		if time() - self.prevClick < 0.1 then
 			return Enum.ContextActionResult.Pass
 		end
@@ -404,6 +425,10 @@ function Stamina.ConnectKey(self: Stamina)
 		end
 
 		if self.requestingSprint then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if not self:CanUnCrouch() then
 			return Enum.ContextActionResult.Pass
 		end
 

@@ -40,7 +40,7 @@
         "UseStrafingAnimations": false,
 
         "Attributes": {
-			    "AdminIsRegularPlayer": {"Bool": true}
+			    "AdminIsRegularPlayer": {"Bool": false}
 		    }
       }
     },

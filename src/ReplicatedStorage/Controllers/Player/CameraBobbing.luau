@@ -163,7 +163,7 @@ function CameraBobber.BobbingFrame(self: CameraBobber, delta: number)
 	if self.isCrouched ~= self.prevCrouch then
 		self.prevCrouch = self.isCrouched
 
-		local goal = Vector3.new(0, self.isCrouched and -1.3 or 0, 0)
+		local goal = self.isCrouched and Vector3.new(0, -1.3, -1) or Vector3.zero
 		local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad)
 
 		TweenService:Create(self.humanoid, info, { CameraOffset = goal }):Play()
