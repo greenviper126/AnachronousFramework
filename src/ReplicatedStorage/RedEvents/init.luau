@@ -39,6 +39,9 @@ local fromNetworkClient = {
 	FlashlightState = Red.SharedSignalEvent("FlashlightState", function(on)
 		return Guard.Boolean(on)
 	end),
+	Examples = Red.SharedSignalEvent("ExamplesClient", function(class, name)
+		return Guard.String("class"), Guard.String(name)
+	end),
 
 	Respawn = Red.SharedSignalEvent("Respawn", function()
 		return nil

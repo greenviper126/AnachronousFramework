@@ -123,8 +123,6 @@ function Task.RemoveTask(self: Task)
 	self.prevName = nil
 	self.prevDescription = nil
 
-	self.description.Text = ""
-
 	self:FadeUI("Out")
 end
 
