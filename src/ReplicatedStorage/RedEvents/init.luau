@@ -22,6 +22,9 @@ local fromNetworkServer = {
 	RoleCredits = Red.SharedSignalEvent("RoleCredits", function()
 		return nil
 	end),
+	SendLine = Red.SharedSignalEvent("SindLineServer", function(header, text, weight)
+		return Guard.Or(Guard.Instance, Guard.String)(header), Guard.String(text), Guard.Number(weight)
+	end),
 
 	--functions
 

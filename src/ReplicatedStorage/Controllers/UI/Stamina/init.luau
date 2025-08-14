@@ -102,7 +102,9 @@ function Stamina.new(root: Part?)
 	local staminaGUI, staminaHolder, staminaBar = StaminaUI.New(player.PlayerGui)
 	self._cleaner:Add(staminaGUI)
 	self.staminaHolder = staminaHolder
+
 	self.staminaBar = staminaBar
+	self.staminaBar.BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR
 
 	self.humanoid = humanoid
 
@@ -243,7 +245,7 @@ end
 	@param self Stamina - object
 ]]
 function Stamina.SetReachBottom(self: Stamina)
-	if self:GetStaminaPercentage() == 0 then
+	if self:GetStaminaPercentage() <= 0.0001 then
 		self.reachedBottom = true
 		self:SetWalkSpeed("Walk")
 		self.staminaBar.BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR
@@ -384,6 +386,10 @@ function Stamina.ConnectKey(self: Stamina)
 		end
 
 		if self.requestingCrouch then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if self.reachedBottom then
 			return Enum.ContextActionResult.Pass
 		end
 
