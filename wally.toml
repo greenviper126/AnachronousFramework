@@ -26,7 +26,7 @@ cmdr = "evaera/cmdr@1.12.0" #command console
 red = "red-blox/red@2.3.0" #secure signals and events
 ratelimit = "red-blox/ratelimit@1.0.1" #doesnt come with red for some reason
 
-react-roblox = "jsdotlua/react-roblox@17.2.1" #UI library
+#react-roblox = "jsdotlua/react-roblox@17.2.1" #UI library
 
 trove = "sleitnick/trove@1.5.0"
 dash = "dev-alastair/dash@1.1.2" #for tables / has intellisense
@@ -34,7 +34,7 @@ promise = "evaera/promise@4.0.0" #for some bug prevention
 
 input = "sleitnick/input@2.3.0" #user input
 shake = "sleitnick/shake@1.1.0" #camera shaking
-boattween = "boatbomber/boattween@1.0.1" #more tweening options
+#boattween = "boatbomber/boattween@1.0.1" #more tweening options
 
 stater = "denispionicul/stater@1.0.3" #for monster logic
 
