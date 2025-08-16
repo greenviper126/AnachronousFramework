@@ -35,7 +35,7 @@ local function newLine(): TextLabel
 	infoText.Position = UDim2.new(0.5, 0, 0.97, -3)
 	infoText.RichText = true
 	infoText.Size = UDim2.new(0.65, 0, 0.01, 15)
-	infoText.TextColor3 = GlobalInfo.INFO_TEXT.BASE_TEXT_COLOR
+	infoText.TextColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.TEXT.PRIMARY
 	infoText.TextScaled = false
 	infoText.TextSize = 12
 	infoText.TextTruncate = Enum.TextTruncate.AtEnd
@@ -43,7 +43,6 @@ local function newLine(): TextLabel
 	infoText.TextTransparency = 1
 	infoText.TextStrokeTransparency = 0.7
 	infoText.TextStrokeColor3 = Color3.new(0, 0, 0)
-	infoText.TextStrokeColor3 = Color3.new(0.5, 0.5, 0.5)
 	infoText.TextYAlignment = Enum.TextYAlignment.Top
 
 	local textSizeConstraint = Instance.new("UITextSizeConstraint")
@@ -124,7 +123,15 @@ local function colorText(text: string, color: Color3)
 end
 
 local function getPlayerColor(playerForColor: Player)
-	return GlobalInfo.INFO_TEXT.PLAYER_COLORS[playerForColor:GetAttribute("_InfoId") :: number or GlobalInfo.MAX_PLAYERS + 1]
+	local sortedPlayers = {}
+	for _, newPlayer in pairs(Players:GetPlayers()) do
+		table.insert(sortedPlayers, newPlayer.UserId)
+	end
+	table.sort(sortedPlayers)
+
+	local index = table.find(sortedPlayers, playerForColor.UserId) or GlobalInfo.MAX_PLAYERS + 1
+
+	return GlobalInfo.INFO_TEXT.PLAYER_COLORS[index]
 end
 
 local function addFullLine(name: string, text: string, weight: number)
@@ -141,6 +148,7 @@ local function addFullLocalLine(text: string, weight: number)
 	local realWeight = math.clamp(weight, 0, 99)
 	local color = getPlayerColor(player)
 	local name = colorText(player.Name, color)
+
 	addFullLine(name, text, realWeight)
 end
 

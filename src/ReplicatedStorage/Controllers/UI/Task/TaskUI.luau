@@ -1,5 +1,9 @@
 --!strict
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+
 return {
 	New = function(parent: Instance)
 		local taskUI = Instance.new("ScreenGui")
@@ -19,7 +23,6 @@ return {
 		local holder = Instance.new("CanvasGroup")
 		holder.Name = "Holder"
 		holder.BackgroundTransparency = 1
-		holder.GroupColor3 = Color3.fromRGB(255, 254, 225)
 		holder.GroupTransparency = 1
 		holder.Size = UDim2.new(0.16, 85, 0.17, 90)
 		holder.SizeConstraint = Enum.SizeConstraint.RelativeXX
@@ -32,7 +35,7 @@ return {
 		title.LayoutOrder = 1
 		title.Size = UDim2.fromScale(1, 0.1)
 		title.Text = "Task"
-		title.TextColor3 = Color3.new(1, 1, 1)
+		title.TextColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.LIGHT
 		title.TextScaled = true
 		title.TextStrokeTransparency = 0.5
 		title.TextTransparency = 0.2
@@ -60,7 +63,7 @@ return {
 		description.LayoutOrder = 3
 		description.Size = UDim2.fromScale(0.9, 0.8)
 		description.Text = "Go find your flashlight!"
-		description.TextColor3 = Color3.new(1, 1, 1)
+		description.TextColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.TEXT.PRIMARY
 		description.TextScaled = true
 		description.TextStrokeTransparency = 0.5
 		description.TextTransparency = 0.05
@@ -76,7 +79,7 @@ return {
 
 		local divider = Instance.new("Frame")
 		divider.Name = "Divider"
-		divider.BackgroundColor3 = Color3.fromRGB(225, 225, 225)
+		divider.BackgroundColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.LIGHT
 		divider.BackgroundTransparency = 0.15
 		divider.BorderColor3 = Color3.new()
 		divider.BorderSizePixel = 0

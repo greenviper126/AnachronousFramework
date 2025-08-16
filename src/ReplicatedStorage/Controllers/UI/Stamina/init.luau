@@ -37,6 +37,9 @@ local speedMultiplier = 1
 local regenMultiplier = 1
 local drainMultiplier = 1
 
+local defaultBarColor = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.VERY_LIGHT
+local tiredBarColor = Color3.new(defaultBarColor.R * 0.5, defaultBarColor.G * 0.5, defaultBarColor.B * 0.5)
+
 local Stamina = {}
 Stamina.__index = Stamina
 Stamina.TAG_NAME = "Stamina"
@@ -104,7 +107,7 @@ function Stamina.new(root: Part?)
 	self.staminaHolder = staminaHolder
 
 	self.staminaBar = staminaBar
-	self.staminaBar.BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR
+	self.staminaBar.BackgroundColor3 = defaultBarColor
 
 	self.humanoid = humanoid
 
@@ -248,13 +251,12 @@ function Stamina.SetReachBottom(self: Stamina)
 	if self:GetStaminaPercentage() <= 0.0001 then
 		self.reachedBottom = true
 		self:SetWalkSpeed("Walk")
-		self.staminaBar.BackgroundColor3 = GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR
+		self.staminaBar.BackgroundColor3 = tiredBarColor
 	elseif self:GetStaminaPercentage() >= 0.5 then
 		self.reachedBottom = false
 
-		if self.staminaBar.BackgroundColor3 == GlobalInfo.MOVEMENT.STAMINA.TIRED_BAR_COLOR then
+		if self.staminaBar.BackgroundColor3 == tiredBarColor then
 			local tweenInfo = TweenInfo.new(GlobalInfo.MOVEMENT.STAMINA.TIRED_TRANSITION_TIME, Enum.EasingStyle.Sine)
-			local defaultBarColor = GlobalInfo.MOVEMENT.STAMINA.DEFAULT_BAR_COLOR
 
 			TweenService:Create(self.staminaBar, tweenInfo, { BackgroundColor3 = defaultBarColor }):Play()
 		end

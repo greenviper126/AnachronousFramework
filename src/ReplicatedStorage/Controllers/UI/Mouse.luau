@@ -10,6 +10,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local Input = require(ReplicatedStorage.Packages.input)
 
+local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
@@ -27,6 +28,7 @@ dot.Position = UDim2.fromScale(0.5, 0.5)
 dot.Size = UDim2.fromOffset(20, 20)
 dot.SizeConstraint = Enum.SizeConstraint.RelativeXX
 dot.Image = "rbxassetid://" .. DEFAULT_MOUSE_IMAGE
+dot.ImageColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.VERY_LIGHT
 dot.BackgroundTransparency = 1
 dot.ScaleType = Enum.ScaleType.Crop
 dot.Parent = MouseGUI

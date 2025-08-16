@@ -6,6 +6,7 @@
         "Flipbook",
         "fpart",
         "gsub",
+        "INTERACTABLE",
         "ipairs",
         "Keypoint",
         "Lerp",

@@ -15,6 +15,7 @@ local RunService = game:GetService("RunService")
 local Input = require(ReplicatedStorage.Packages.input)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
+local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local Highlighter = require(script:WaitForChild("Highlighter"))
@@ -224,14 +225,17 @@ ContextActionService:BindActionAtPriority(
 local HighlightPrompt = {}
 
 function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Confirm" | "Deny")
+	local greenAccent = GlobalInfo.COLOR_THEME.ACCENT.GREEN
+	local redAccent = GlobalInfo.COLOR_THEME.ACCENT.RED
+
 	if preset == "Confirm" then
-		prompt.HighlightOutlineColor = Color3.new(0.55, 1, 0.55)
-		prompt.HighlightFillColor = Color3.new(0.48, 0.89, 0.48)
+		prompt.HighlightOutlineColor = greenAccent
+		prompt.HighlightFillColor = Color3.new(greenAccent.R * 1.2, greenAccent.G * 1.2, greenAccent.B * 1.2)
 		prompt.HighlightOutlineTransparency = 0.25
 		prompt.HighlightFillTransparency = 0.7
 	elseif preset == "Deny" then
-		prompt.HighlightOutlineColor = Color3.new(1, 0.27, 0.27)
-		prompt.HighlightFillColor = Color3.new(0.81, 0.34, 0.34)
+		prompt.HighlightOutlineColor = redAccent
+		prompt.HighlightFillColor = Color3.new(redAccent.R * 1.2, redAccent.G * 1.2, redAccent.B * 1.2)
 		prompt.HighlightOutlineTransparency = 0.25
 		prompt.HighlightFillTransparency = 0.7
 	end

@@ -1,5 +1,9 @@
 --!strict
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
+
 return {
 	New = function(parent: Instance)
 		local stamina = Instance.new("ScreenGui")
@@ -27,7 +31,7 @@ return {
 
 		local amount = Instance.new("Frame")
 		amount.Name = "Amount"
-		amount.BackgroundColor3 = Color3.fromRGB(252, 250, 255)
+		amount.BackgroundColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.VERY_LIGHT
 		amount.BackgroundTransparency = 0.2
 		amount.Size = UDim2.fromScale(1, 1)
 		amount.Parent = bar
@@ -36,8 +40,7 @@ return {
 
 		local background = Instance.new("Frame")
 		background.Name = "Background"
-		background.BackgroundColor3 = Color3.new()
-		background.BorderColor3 = Color3.new()
+		background.BackgroundColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.VERY_DARK
 		background.BorderSizePixel = 0
 		background.Size = UDim2.fromScale(1, 1)
 		background.ZIndex = 0

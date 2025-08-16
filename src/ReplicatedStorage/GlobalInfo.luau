@@ -8,12 +8,52 @@ local GlobalInfo = {}
 
 GlobalInfo.MAX_PLAYERS = 6 --int
 
-GlobalInfo.FLASHLIGHT = {
-	LIGHT_SWITCH_SPEED = 1, -- float - should be greater than 0.7
+GlobalInfo.CAMERA = {
+	DEFAULT_FOV = 80, --int
 }
 
-GlobalInfo.CAMERA = {
-	DEFAULT_FOV = 80,
+GlobalInfo.COLOR_THEME = { --Color3
+	PRIMARY = Color3.fromRGB(240, 240, 124),
+	SECONDARY = Color3.fromRGB(210, 210, 90),
+
+	ACCENT = {
+		RED = Color3.fromRGB(180, 58, 58),
+		GREEN = Color3.fromRGB(58, 180, 58),
+		BLUE = Color3.fromRGB(58, 58, 180),
+		YELLOW = Color3.fromRGB(180, 180, 58),
+	},
+
+	NEUTRAL = {
+		TEXT = {
+			PRIMARY = Color3.fromRGB(255, 255, 237),
+			SECONDARY = Color3.fromRGB(108, 117, 125),
+			INVERTED = Color3.fromRGB(30, 30, 30),
+		},
+		BACKGROUND = {
+			LIGHT = Color3.fromRGB(240, 240, 180),
+			VERY_LIGHT = Color3.fromRGB(250, 250, 230),
+			DARK = Color3.fromRGB(40, 40, 40),
+			VERY_DARK = Color3.fromRGB(0, 0, 0),
+		},
+	},
+
+	HIGHLIGHT = {
+		SOFT_WARNING = Color3.fromRGB(255, 154, 3),
+		WARNING = Color3.fromRGB(255, 3, 3),
+	},
+}
+
+GlobalInfo.INFO_TEXT = {
+	CHAR_PER_MIN = 17, --int
+	PLAYER_COLORS = { --Color3
+		[1] = Color3.fromRGB(194, 53, 43),
+		[2] = Color3.fromRGB(70, 136, 28),
+		[3] = Color3.fromRGB(46, 57, 156),
+		[4] = Color3.fromRGB(106, 44, 126),
+		[5] = Color3.fromRGB(179, 170, 57),
+		[6] = Color3.fromRGB(45, 180, 169),
+		[GlobalInfo.MAX_PLAYERS + 1] = Color3.fromRGB(255, 140, 250), --reserved for loading issues
+	},
 }
 
 GlobalInfo.MOVEMENT = {
@@ -36,23 +76,11 @@ GlobalInfo.MOVEMENT = {
 		FULL_STAMIN_WAIT_TIME = 1.5, --float
 		FULL_STAMIN_FADE_TIME = 1, --float
 		TIRED_TRANSITION_TIME = 1.5, --float
-		DEFAULT_BAR_COLOR = Color3.new(1, 1, 0.93), --Color3
-		TIRED_BAR_COLOR = Color3.new(0.27, 0.27, 0.266), --Color3
 	},
 }
 
-GlobalInfo.INFO_TEXT = {
-	CHAR_PER_MIN = 17, --int
-	BASE_TEXT_COLOR = Color3.new(1, 1, 0.93),
-	PLAYER_COLORS = { --Color3
-		[1] = Color3.fromRGB(194, 68, 43),
-		[2] = Color3.fromRGB(70, 136, 28),
-		[3] = Color3.fromRGB(46, 57, 156),
-		[4] = Color3.fromRGB(106, 44, 126),
-		[5] = Color3.fromRGB(179, 170, 57),
-		[6] = Color3.fromRGB(45, 180, 169),
-		[GlobalInfo.MAX_PLAYERS + 1] = Color3.fromRGB(255, 140, 250), --reserved for loading issues
-	},
+GlobalInfo.FLASHLIGHT = {
+	LIGHT_SWITCH_SPEED = 1, -- float - should be greater than 0.7
 }
 
 GlobalInfo.SPAWN = {
