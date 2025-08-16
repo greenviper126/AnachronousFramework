@@ -40,4 +40,13 @@ function Task.Remove()
 	Players:SetAttribute("_Task", nil)
 end
 
+--[[
+	Get the name of the current Task.
+
+	@return string? - name of the objective
+]]
+function Task.FetchCurrentName(): string?
+	return Players:GetAttribute("_TaskName")
+end
+
 return Task
