@@ -181,7 +181,7 @@ end)
 
 --server
 RedEvents.Network.Server.SendLine:OnClient(function(header: Instance | string, text: string, weight: number)
-	local realWeight = math.clamp(weight, 100, math.huge)
+	local realWeight = math.clamp(weight or 0, 100, math.huge)
 
 	if typeof(header) == "string" then
 		addFullLine(header, text, realWeight)

@@ -13,7 +13,7 @@ return {
 
 		function(context)
 			return {
-				Type = context.Cmdr.Util.MakeEnumType("option", { "LocalHeader", "CustomHeader" }),
+				Type = context.Cmdr.Util.MakeEnumType("option", { "LocalHeader", "CustomHeader", "TestLine" }),
 				Name = "action",
 				Description = "The action you would like to do with the Objective.",
 			}

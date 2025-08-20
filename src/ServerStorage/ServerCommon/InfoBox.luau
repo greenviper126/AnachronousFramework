@@ -42,7 +42,9 @@ end
     @return number - assumed time to finish
 ]]
 function InfoBox.SendLineToPlayer(player: Player, header: Player | string, text: string, weight: number): number
-	RedEvents.Network.Server.SendLine:FireClient(player, header, text, weight)
+	local realWeight = weight or 0 --red will throw silent error if type is nil
+
+	RedEvents.Network.Server.SendLine:FireClient(player, header, text, realWeight)
 	return InfoBox.CalculateTextDisplayTime(header, text)
 end
 
