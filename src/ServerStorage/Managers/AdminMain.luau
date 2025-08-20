@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local adminIds = {
-	295701650, --fatmad
+	328686652, --fatmad
 	2221989135, --viper
 }
 

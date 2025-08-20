@@ -79,6 +79,8 @@ end
 ]]
 return function()
 	if RunService:IsServer() then
+		task.wait() --give server a sec to be ready
+
 		assetsLoader()
 
 		local ServerStorage = game:GetService("ServerStorage")
@@ -86,7 +88,7 @@ return function()
 
 		LoadFromFile(managers)
 	elseif RunService:IsClient() then
-		task.wait(1) --let instances load in
+		task.wait(2) --let instances load in
 
 		local ReplicatedStorage = game:GetService("ReplicatedStorage")
 		local controllers = ReplicatedStorage:WaitForChild("Controllers")

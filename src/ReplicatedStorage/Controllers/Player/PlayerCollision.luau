@@ -124,7 +124,7 @@ end
 -------------------------------------------------------------------------------------------
 
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(PlayerCollision.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListner(PlayerCollision.new(), PlayerCollision)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(PlayerCollision)
 local _uniqueClass = Utility.Tags.GetUniqueClass(PlayerCollision.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------

@@ -269,7 +269,7 @@ end
 -------------------------------------------------------------------------------------------
 
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(CameraBobber.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListner(CameraBobber.new(), CameraBobber)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(CameraBobber)
 local _uniqueClass = Utility.Tags.GetUniqueClass(CameraBobber.TAG_NAME, _objects)
 
 RedEvents.Signal.Client.WalkState:Connect(function(state: "Crouch" | "Walk" | "Sprint")
@@ -288,7 +288,7 @@ receiveSignal("SetFirstPerson", function(set)
 end)
 
 receiveSignal("GetFirstPerson", function(): boolean
-	return player:GetAttribute("IsFirstPerson")
+	return player:GetAttribute("IsFirstPerson") :: boolean
 end)
 
 receiveSignal("ConnectFunctionToFirstPersonType", function(func: () -> ())

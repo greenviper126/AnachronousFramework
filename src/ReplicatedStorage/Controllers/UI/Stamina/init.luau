@@ -330,9 +330,13 @@ end
 	@param self Stamina - object
 ]]
 function Stamina.CanUnCrouch(self: Stamina): boolean
+	if not player.Character then
+		return false
+	end
+
 	local param = RaycastParams.new()
 	param.RespectCanCollide = false
-	param.FilterDescendantsInstances = { player.Character:GetDescendants() }
+	param.FilterDescendantsInstances = { table.unpack(player.Character:GetDescendants()) }
 
 	local ray = workspace:Raycast(self.root.Position, self.root.CFrame.UpVector * UN_CROUCH_CHECK_DISTANCE, param)
 
@@ -481,7 +485,7 @@ end
 -------------------------------------------------------------------------------------------
 
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(Stamina.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListner(Stamina.new(), Stamina)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(Stamina)
 local _uniqueClass = Utility.Tags.GetUniqueClass(Stamina.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------

@@ -69,8 +69,8 @@ local function getCharacterParts()
 	end
 
 	pcall(function()
-		humanoid = player.Character:WaitForChild("Humanoid", 3)
-		root = player.Character:WaitForChild("HumanoidRootPart", 3)
+		humanoid = player.Character:WaitForChild("Humanoid", 3) :: Humanoid
+		root = player.Character:WaitForChild("HumanoidRootPart", 3) :: Part
 	end)
 end
 

@@ -96,27 +96,22 @@ function Highlighter._init(self: Highlighter)
 	elseif self.base:IsA("BasePart") then
 		AddHighlight(self.base)
 	end
+end
 
-	local function setProperties()
-		for k, v in pairs(Utility.Properties.AttributesToProperties(self.base)) do
-			pcall(function()
-				for _, highlight: any in pairs(self.highlights) do
-					highlight[k:gsub("Highlight", "")] = v
-				end
-			end)
-		end
+function Highlighter.SetProperty(self: Highlighter, property: string, value: any)
+	for _, highlight in pairs(self.highlights) do
+		Utility.Properties.ApplyPropertyValueToInstance(highlight, property, value)
+	end
+end
+
+function Highlighter.GetProperty(self: Highlighter, property: string): any?
+	local result = nil
+	for _, highlight in pairs(self.highlights) do
+		result = Utility.Properties.InstanceToProperties(highlight)[property]
+		break
 	end
 
-	setProperties()
-	self._cleaner:Connect(self.base.AttributeChanged, function()
-		setProperties()
-	end)
-
-	self._cleaner:Add(function() --remove all highlight attributes when cleaning up
-		for k, _ in pairs(Utility.Properties.InstanceToProperties(self.base)) do
-			self.base:SetAttribute("Highlight" .. k, nil)
-		end
-	end)
+	return result
 end
 
 function Highlighter.Cleanup(self: Highlighter)

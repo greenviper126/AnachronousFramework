@@ -103,7 +103,8 @@ local function createPrompt(parent: Instance): HighlightPrompt
 
 			local raycastParams = RaycastParams.new()
 			raycastParams.IgnoreWater = true
-			raycastParams.FilterDescendantsInstances = { player.Character:GetDescendants() }
+
+			raycastParams.FilterDescendantsInstances = { table.unpack(player.Character:GetDescendants()) }
 
 			local ray = Input.Mouse:Raycast(raycastParams)
 
@@ -114,36 +115,44 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			end
 		end
 
-		parent:SetAttribute("HighlightEnabled", false)
+		local prevEnabled = false
+
+		self:SetProperty("Enabled", false)
 		cleaner:Connect(RunService.RenderStepped, function()
-			parent:SetAttribute("HighlightDepthMode", results.HighlightDepthMode)
-			parent:SetAttribute("HighlightOutlineColor", results.HighlightOutlineColor)
-			parent:SetAttribute("HighlightFillColor", results.HighlightFillColor)
-			parent:SetAttribute("HighlightOutlineTransparency", results.HighlightOutlineTransparency)
-			parent:SetAttribute("HighlightFillTransparency", results.HighlightFillTransparency)
+			self:SetProperty("DepthMode", results.HighlightDepthMode)
+			self:SetProperty("OutlineColor", results.HighlightOutlineColor)
+			self:SetProperty("FillColor", results.HighlightFillColor)
+			self:SetProperty("OutlineTransparency", results.HighlightOutlineTransparency)
+			self:SetProperty("FillTransparency", results.HighlightFillTransparency)
 
 			if not results.Enabled then
-				parent:SetAttribute("HighlightEnabled", false)
+				self:SetProperty("Enabled", false)
 				return
 			end
 
-			if hitHighlightPrompt() then
-				parent:SetAttribute("HighlightEnabled", true)
-			else
-				parent:SetAttribute("HighlightEnabled", false)
+			self:SetProperty("Enabled", hitHighlightPrompt())
+
+			if prevEnabled ~= self:GetProperty("Enabled") then
+				if self:GetProperty("Enabled") then
+					hoverEnter:Fire()
+				else
+					hoverEscape:Fire()
+				end
 			end
+
+			prevEnabled = self:GetProperty("Enabled") :: boolean
 		end)
 
 		cleaner:Connect(parent.AttributeChanged, function(attribute: string)
 			if not results.Enabled then
 				return
 			end
+
 			if attribute ~= "HighlightEnabled" then
 				return
 			end
 
-			local highlightHoverEnabled = parent:GetAttribute("HighlightEnabled")
-			if highlightHoverEnabled then
+			if self:GetProperty("Enabled") then
 				hoverEnter:Fire()
 			else
 				hoverEscape:Fire()
@@ -155,6 +164,7 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			if not results.ClickablePrompt then
 				return
 			end
+
 			if not results.Enabled then
 				return
 			end
@@ -164,8 +174,7 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			end
 			lastActivationTime = time()
 
-			local highlightEnabled = parent:GetAttribute("HighlightEnabled")
-			if not highlightEnabled then
+			if not self:GetProperty("Enabled") then
 				return
 			end
 
@@ -173,7 +182,6 @@ local function createPrompt(parent: Instance): HighlightPrompt
 		end)
 
 		cleaner:Add(function()
-			parent:SetAttribute("HighlightEnabled", nil)
 			parent:RemoveTag("HighlightHover")
 			connection()
 			self:Cleanup()

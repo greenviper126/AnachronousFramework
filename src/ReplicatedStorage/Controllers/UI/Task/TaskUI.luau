@@ -34,7 +34,7 @@ return {
 			Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 		title.LayoutOrder = 1
 		title.Size = UDim2.fromScale(1, 0.1)
-		title.Text = "Task"
+		title.Text = "Objective"
 		title.TextColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.BACKGROUND.LIGHT
 		title.TextScaled = true
 		title.TextStrokeTransparency = 0.5
@@ -101,6 +101,6 @@ return {
 
 		taskUI.Parent = parent
 
-		return taskUI, holder, description
+		return taskUI, holder, description, divider
 	end,
 }

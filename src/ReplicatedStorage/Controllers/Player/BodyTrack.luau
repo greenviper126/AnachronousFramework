@@ -25,8 +25,8 @@ RunService.RenderStepped:Connect(function(delta: number)
 		return
 	end
 
-	local head = player.Character.Head
-	local upperTorso = player.Character.UpperTorso
+	local head = player.Character:FindFirstChild("Head") :: BasePart?
+	local upperTorso = player.Character:FindFirstChild("UpperTorso") :: BasePart?
 
 	if head == nil or head:FindFirstChild("Neck") == nil then
 		return
@@ -36,10 +36,10 @@ RunService.RenderStepped:Connect(function(delta: number)
 	end
 
 	-- for looking up and down
-	local theta = math.clamp(math.asin(camera.CFrame.LookVector.y), -1.2, 1.2)
+	local theta = math.clamp(math.asin(camera.CFrame.LookVector.Y), -1.2, 1.2)
 
 	-- this will set it locally for this player
-	local neck, waist = head.Neck, upperTorso.Waist
+	local neck, waist = head:FindFirstChild("Neck") :: Motor6D, upperTorso:FindFirstChild("Waist") :: Motor6D
 	local neckCFrame = neckC0 * CFrame.Angles(theta * 0.5, 0, 0)
 	local waistCFrame = waistC0 * CFrame.Angles(theta * 0.5, 0, 0)
 

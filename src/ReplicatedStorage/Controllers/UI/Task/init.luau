@@ -24,6 +24,9 @@ type self = {
 	gui: ScreenGui,
 	canvas: CanvasGroup,
 	description: TextLabel,
+	divider: Frame,
+
+	newObjectiveThread: thread?,
 
 	fadeTween: Tween,
 
@@ -44,14 +47,16 @@ function Task.new()
 	if not Utility.Tags.GetUnique(Task.TAG_NAME) then
 		warn("There is more than one object with the " .. Task.TAG_NAME .. " Tag")
 	end
+	print("AHHHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!")
 
 	local self = setmetatable({} :: self, Task)
 	self._cleaner = Trove.new()
 
-	local gui, canvas, description = taskUI.New(player.PlayerGui)
+	local gui, canvas, description, divider = taskUI.New(player.PlayerGui)
 	self.gui = gui
 	self.canvas = canvas
 	self.description = description
+	self.divider = divider
 
 	self._cleaner:Add(gui)
 
@@ -67,7 +72,7 @@ end
 	@return string? - description of task
 ]]
 function Task.GetData(): (string?, string?)
-	return Players:GetAttribute("_TaskName"), Players:GetAttribute("_Task")
+	return Players:GetAttribute("_TaskName") :: string, Players:GetAttribute("_Task") :: string
 end
 
 --[[
@@ -87,6 +92,22 @@ function Task.FadeUI(self: Task, direction: "In" | "Out"): number
 end
 
 --[[
+	Animates the separator line
+
+	@param self Task - object
+
+	@return number - wait time
+]]
+function Task.AnimateLine(self: Task, direction: "In" | "Out"): number
+	local sizeValue = direction == "In" and 1 or 0.1
+	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
+
+	TweenService:Create(self.divider, tweenInfo, { Size = UDim2.new(sizeValue, 0, 0, 10) }):Play()
+
+	return tweenInfo.Time + tweenInfo.DelayTime
+end
+
+--[[
 	Creates a new task
 
 	@param self Task - object
@@ -94,11 +115,27 @@ end
 	@param description string? - description of the text
 ]]
 function Task.NewTask(self: Task, name: string?, description: string?)
-	self.prevName = name
-	self.prevDescription = description
+	if self.newObjectiveThread then
+		task.cancel(self.newObjectiveThread)
+	end
 
-	self.description.Text = description or ""
-	self:FadeUI("In")
+	self.newObjectiveThread = task.spawn(function()
+		--fade out
+
+		if self.prevName then
+			self:RemoveTask()
+			task.wait(1 + 0.5)
+		end
+
+		--add new task
+		self.prevName = name
+		self.prevDescription = description
+		self.description.Text = description or ""
+
+		--fade in
+		self:FadeUI("In")
+		self:AnimateLine("In")
+	end)
 end
 
 --[[
@@ -124,6 +161,7 @@ function Task.RemoveTask(self: Task)
 	self.prevDescription = nil
 
 	self:FadeUI("Out")
+	self:AnimateLine("Out")
 end
 
 --[[
@@ -137,15 +175,21 @@ function Task.Listen(self: Task)
 			return
 		end
 
-		local description = Players:GetAttribute("_Task")
-		local name = Players:GetAttribute("_TaskName")
+		local description = Players:GetAttribute("_Task") :: string?
+		local name = Players:GetAttribute("_TaskName") :: string?
 
-		if name == nil or description == nil then -- no data
-			self:RemoveTask()
-		elseif self.prevName ~= name then -- name changed
-			self:NewTask(name, description)
-		elseif self.prevDescription ~= description then -- description changed
-			self:UpdateTask(name, description)
+		if attribute == "_TaskName" then
+			if name == nil then -- no data
+				print("remove")
+				self:RemoveTask()
+			elseif self.prevName ~= name then -- name changed
+				print("add", name)
+				self:NewTask(name, description)
+			end
+		elseif attribute == "_Task" then
+			if self.prevName == name then
+				self:UpdateTask(name, description) --update
+			end
 		end
 	end)
 end
@@ -162,7 +206,7 @@ end
 -------------------------------------------------------------------------------------------
 
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(Task.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListner(Task.new(), Task)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(Task)
 local _uniqueClass = Utility.Tags.GetUniqueClass(Task.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------

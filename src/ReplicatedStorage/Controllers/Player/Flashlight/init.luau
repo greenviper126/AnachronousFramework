@@ -55,11 +55,11 @@ function Light.new()
 	self._cleaner = Trove.new()
 
 	local r, l1, l2, aP, aO = LightInstance.New(camera)
-	self.ring = r
-	self.light1 = l1
-	self.light2 = l2
-	self.alignPosition = aP
-	self.alignOrientation = aO
+	self.ring = r :: any
+	self.light1 = l1 :: any
+	self.light2 = l2 :: any
+	self.alignPosition = aP :: any
+	self.alignOrientation = aO :: any
 
 	self.prevClick = 0
 
@@ -82,9 +82,13 @@ function Light.DisableFakeLight()
 
 	local foundFakeLight = false
 
-	for _, light: SpotLight in pairs(lights) do
+	for _, light in pairs(lights) do
+		if not light:IsA("SpotLight") then
+			continue
+		end
+
 		local newCharacter = light:FindFirstAncestorOfClass("Model")
-		if newCharacter and newCharacter.Name == player.character.Name then
+		if newCharacter and newCharacter.Name == player.Character.Name then
 			foundFakeLight = true
 
 			light.Enabled = false
@@ -249,7 +253,7 @@ end
 -------------------------------------------------------------------------------------------
 
 local _characterTagConnection = Utility.Tags.TagCharacterConnection(Light.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListner(Light.new(), Light)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(Light)
 local _uniqueClass = Utility.Tags.GetUniqueClass(Light.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------

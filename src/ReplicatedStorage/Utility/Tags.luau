@@ -102,13 +102,12 @@ end
 --[[
 	Basic setup for listening in on tags for OOP structures
 
-	@param _constructor T&any - The constructor to set the type
 	@param class any - A metatable with some certain requirements
 
 	@return () -> () - Cleanup function
 	@return () -> ({ [Instance]: T }) - Instances that have been attached to this class
 ]]
-local function setObjectListner<T>(_constructor: T, class: any): (() -> (), () -> { [Instance]: T })
+local function setObjectListener<T>(class: any): (() -> (), () -> { [Instance]: T })
 	local instances = {}
 
 	local instanceAddedSignal = CollectionService:GetInstanceAddedSignal(class.TAG_NAME)
@@ -198,7 +197,7 @@ return {
 	GetUnique = getUnique,
 	GetAll = getAll,
 	GetAny = getAny,
-	SetObjectListner = setObjectListner,
+	SetObjectListener = setObjectListener,
 	TagCharacterConnection = tagCharacterConnection,
 	GetUniqueClass = getUniqueClass,
 }

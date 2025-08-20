@@ -13,9 +13,6 @@ GlobalInfo.CAMERA = {
 }
 
 GlobalInfo.COLOR_THEME = { --Color3
-	PRIMARY = Color3.fromRGB(240, 240, 124),
-	SECONDARY = Color3.fromRGB(210, 210, 90),
-
 	ACCENT = {
 		RED = Color3.fromRGB(180, 58, 58),
 		GREEN = Color3.fromRGB(58, 180, 58),
@@ -25,13 +22,13 @@ GlobalInfo.COLOR_THEME = { --Color3
 
 	NEUTRAL = {
 		TEXT = {
-			PRIMARY = Color3.fromRGB(255, 255, 237),
+			PRIMARY = Color3.fromRGB(243, 243, 243),
 			SECONDARY = Color3.fromRGB(108, 117, 125),
 			INVERTED = Color3.fromRGB(30, 30, 30),
 		},
 		BACKGROUND = {
-			LIGHT = Color3.fromRGB(240, 240, 180),
-			VERY_LIGHT = Color3.fromRGB(250, 250, 230),
+			LIGHT = Color3.fromRGB(243, 243, 243),
+			VERY_LIGHT = Color3.fromRGB(245, 244, 244),
 			DARK = Color3.fromRGB(40, 40, 40),
 			VERY_DARK = Color3.fromRGB(0, 0, 0),
 		},

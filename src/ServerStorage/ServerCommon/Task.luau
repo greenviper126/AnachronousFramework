@@ -46,7 +46,7 @@ end
 	@return string? - name of the objective
 ]]
 function Task.FetchCurrentName(): string?
-	return Players:GetAttribute("_TaskName")
+	return Players:GetAttribute("_TaskName") :: string?
 end
 
 return Task

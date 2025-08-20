@@ -37,17 +37,17 @@ local function newLine(): TextLabel
 	infoText.Size = UDim2.new(0.65, 0, 0.01, 15)
 	infoText.TextColor3 = GlobalInfo.COLOR_THEME.NEUTRAL.TEXT.PRIMARY
 	infoText.TextScaled = false
-	infoText.TextSize = 12
+	infoText.TextSize = 17
 	infoText.TextTruncate = Enum.TextTruncate.AtEnd
 	infoText.TextWrapped = true
 	infoText.TextTransparency = 1
-	infoText.TextStrokeTransparency = 0.7
+	infoText.TextStrokeTransparency = 0.5
 	infoText.TextStrokeColor3 = Color3.new(0, 0, 0)
 	infoText.TextYAlignment = Enum.TextYAlignment.Top
 
 	local textSizeConstraint = Instance.new("UITextSizeConstraint")
 	textSizeConstraint.MinTextSize = 4
-	textSizeConstraint.MaxTextSize = 25
+	textSizeConstraint.MaxTextSize = 17
 	textSizeConstraint.Parent = infoText
 
 	return infoText
