@@ -26,6 +26,8 @@ return {
 		holder.GroupTransparency = 1
 		holder.Size = UDim2.new(0.16, 85, 0.17, 90)
 		holder.SizeConstraint = Enum.SizeConstraint.RelativeXX
+		holder.AnchorPoint = Vector2.new(1, 0)
+		holder.Position = UDim2.fromScale(0.955, 0)
 
 		local title = Instance.new("TextLabel")
 		title.Name = "Title"
@@ -84,7 +86,7 @@ return {
 		divider.BorderColor3 = Color3.new()
 		divider.BorderSizePixel = 0
 		divider.LayoutOrder = 2
-		divider.Size = UDim2.new(1, 0, 0, 10)
+		divider.Size = UDim2.new(0.001, 0, 0, 10)
 
 		local uIGradient = Instance.new("UIGradient")
 		uIGradient.Name = "UIGradient"

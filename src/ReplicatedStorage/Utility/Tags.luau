@@ -149,7 +149,7 @@ end
 
 	@return RBXScriptConnection - Disconnects connection
 ]]
-local function tagCharacterConnection(tag: string, tagPlayer: Player?): RBXScriptConnection?
+local function tagCharacterConnection(tag: string, tagPlayer: Player?): () -> ()
 	local player = tagPlayer
 
 	if player == nil and RunService:IsClient() then
@@ -159,9 +159,10 @@ local function tagCharacterConnection(tag: string, tagPlayer: Player?): RBXScrip
 	end
 
 	if not player then
-		return
+		return function() end
 	end
 
+	local diedConnection: RBXScriptConnection? = nil
 	local function tagCharacter()
 		if not player or not player.Character then
 			return
@@ -173,13 +174,43 @@ local function tagCharacterConnection(tag: string, tagPlayer: Player?): RBXScrip
 			return
 		end
 
+		local humanoid = player.Character:FindFirstChild("Humanoid") :: Humanoid
+		if not humanoid then
+			return
+		end
+
+		if diedConnection then
+			diedConnection:Disconnect()
+		end
+
+		diedConnection = humanoid.HealthChanged:Connect(function() -- this may need to change in the future
+			if humanoid.Health > 1 then
+				return
+			end
+
+			print("you died!!!")
+			root:RemoveTag(tag)
+
+			if diedConnection then
+				diedConnection:Disconnect()
+			end
+		end)
+
 		root:AddTag(tag)
 	end
 
 	tagCharacter()
-	return player.CharacterAdded:Connect(function()
+	local characterConnection = player.CharacterAdded:Connect(function()
 		tagCharacter()
 	end)
+
+	return function()
+		characterConnection:Disconnect()
+
+		if diedConnection then
+			diedConnection:Disconnect()
+		end
+	end
 end
 
 local function getUniqueClass<T>(tag: string, objects: () -> { [Instance]: T }): T?

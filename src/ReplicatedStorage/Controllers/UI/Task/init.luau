@@ -12,6 +12,8 @@ local Trove = require(ReplicatedStorage.Packages.trove)
 
 local Utility = require(ReplicatedStorage.Utility)
 
+local Sounds = require(ReplicatedStorage.Common.Sounds)
+
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 local taskUI = require(script:WaitForChild("TaskUI"))
@@ -19,6 +21,7 @@ local taskUI = require(script:WaitForChild("TaskUI"))
 local Task = {}
 Task.__index = Task
 Task.TAG_NAME = "Task"
+Task.PrevNameUsed = nil :: string?
 
 type self = {
 	gui: ScreenGui,
@@ -27,6 +30,7 @@ type self = {
 	divider: Frame,
 
 	newObjectiveThread: thread?,
+	removeObjectiveThread: thread?,
 
 	fadeTween: Tween,
 
@@ -47,7 +51,6 @@ function Task.new()
 	if not Utility.Tags.GetUnique(Task.TAG_NAME) then
 		warn("There is more than one object with the " .. Task.TAG_NAME .. " Tag")
 	end
-	print("AHHHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!")
 
 	local self = setmetatable({} :: self, Task)
 	self._cleaner = Trove.new()
@@ -99,7 +102,7 @@ end
 	@return number - wait time
 ]]
 function Task.AnimateLine(self: Task, direction: "In" | "Out"): number
-	local sizeValue = direction == "In" and 1 or 0.1
+	local sizeValue = direction == "In" and 1 or 0.001
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
 
 	TweenService:Create(self.divider, tweenInfo, { Size = UDim2.new(sizeValue, 0, 0, 10) }):Play()
@@ -124,7 +127,7 @@ function Task.NewTask(self: Task, name: string?, description: string?)
 
 		if self.prevName then
 			self:RemoveTask()
-			task.wait(1 + 0.5)
+			task.wait(1)
 		end
 
 		--add new task
@@ -132,8 +135,15 @@ function Task.NewTask(self: Task, name: string?, description: string?)
 		self.prevDescription = description
 		self.description.Text = description or ""
 
+		if Task.PrevNameUsed ~= name then -- no sound if you respawn unless its new
+			Sounds.PlaySoundByName("NewTask")
+		end
+
 		--fade in
 		self:FadeUI("In")
+
+		task.wait(0.3)
+
 		self:AnimateLine("In")
 	end)
 end
@@ -156,12 +166,25 @@ end
 
 	@param self Task - object
 ]]
-function Task.RemoveTask(self: Task)
+function Task.RemoveTask(self: Task, quite: boolean?)
+	if self.removeObjectiveThread then
+		task.cancel(self.removeObjectiveThread)
+	end
+
 	self.prevName = nil
 	self.prevDescription = nil
 
-	self:FadeUI("Out")
-	self:AnimateLine("Out")
+	if not quite and self.canvas.GroupTransparency == 0 then
+		Sounds.PlaySoundByName("RemoveTask")
+	end
+
+	self.removeObjectiveThread = task.spawn(function()
+		self:AnimateLine("Out")
+
+		task.wait(0.3)
+
+		self:FadeUI("Out")
+	end)
 end
 
 --[[
@@ -170,27 +193,33 @@ end
 	@param self Task - object
 ]]
 function Task.Listen(self: Task)
-	self._cleaner:Connect(Players.AttributeChanged, function(attribute: string)
-		if attribute ~= "_TaskName" and attribute ~= "_Task" then
-			return
-		end
-
+	local function addOrRemove()
 		local description = Players:GetAttribute("_Task") :: string?
 		local name = Players:GetAttribute("_TaskName") :: string?
 
-		if attribute == "_TaskName" then
-			if name == nil then -- no data
-				print("remove")
-				self:RemoveTask()
-			elseif self.prevName ~= name then -- name changed
-				print("add", name)
-				self:NewTask(name, description)
-			end
-		elseif attribute == "_Task" then
-			if self.prevName == name then
-				self:UpdateTask(name, description) --update
-			end
+		if not name then
+			self:RemoveTask()
+		elseif self.prevName ~= name then
+			self:NewTask(name, description)
 		end
+	end
+
+	local function update()
+		local description = Players:GetAttribute("_Task") :: string?
+		local name = Players:GetAttribute("_TaskName") :: string?
+
+		if self.prevName == name and self.prevDescription ~= description then
+			self:UpdateTask(name, description)
+		end
+	end
+
+	addOrRemove()
+	self._cleaner:Connect(Players:GetAttributeChangedSignal("_TaskName"), function()
+		addOrRemove()
+	end)
+
+	self._cleaner:Connect(Players:GetAttributeChangedSignal("_Task"), function()
+		update()
 	end)
 end
 
@@ -200,6 +229,11 @@ end
 	@param self Task - object
 ]]
 function Task.Cleanup(self: Task)
+	Task.PrevNameUsed = self.prevName
+	self:RemoveTask(true)
+
+	task.wait(1.2)
+
 	self._cleaner:Destroy()
 end
 
