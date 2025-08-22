@@ -42,8 +42,8 @@ local fromNetworkClient = {
 	FlashlightState = Red.SharedSignalEvent("FlashlightState", function(on)
 		return Guard.Boolean(on)
 	end),
-	Examples = Red.SharedSignalEvent("ExamplesClient", function(class, name)
-		return Guard.String("class"), Guard.String(name)
+	PromptClassActivation = Red.SharedSignalEvent("PromptClassActivation", function(class, instance)
+		return Guard.String(class), Guard.Instance(instance)
 	end),
 
 	Respawn = Red.SharedSignalEvent("Respawn", function()

@@ -24,7 +24,7 @@ local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 local buttonActivated = RedEvents.NewSignal()
 
-type HighlightPrompt = {
+export type HighlightPrompt = {
 	ClickablePrompt: boolean,
 	Enabled: boolean,
 	MaxActivationDistance: number,
@@ -35,11 +35,13 @@ type HighlightPrompt = {
 	HighlightOutlineTransparency: number,
 	HighlightFillTransparency: number,
 
+	ServerClass: string?,
+
 	HoverEnter: RBXScriptSignal,
 	HoverEscape: RBXScriptSignal,
 	Activated: RBXScriptSignal,
 
-	Destroy: () -> (),
+	Destroy: (HighlightPrompt) -> (),
 }
 
 local function createPrompt(parent: Instance): HighlightPrompt
@@ -61,12 +63,14 @@ local function createPrompt(parent: Instance): HighlightPrompt
 		HighlightOutlineTransparency = 0.25,
 		HighlightFillTransparency = 0.7,
 
+		ServerClass = nil,
+
 		HoverEnter = hoverEnter.Event,
 		HoverEscape = hoverEscape.Event,
 		Activated = activated.Event,
 
-		Destroy = function()
-			cleaner:Destroy()
+		Destroy = function(self: HighlightPrompt)
+			self:Destroy()
 		end,
 	} :: HighlightPrompt
 
@@ -115,49 +119,74 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			end
 		end
 
-		local prevEnabled = false
+		local function fadeHighlight(direction: "In" | "Out")
+			local increment = direction == "In" and -0.04 or 0.04
 
-		self:SetProperty("Enabled", false)
+			local currentOutlineTransparency = self:GetProperty("OutlineTransparency") :: number
+			local newOutlineTransparency =
+				math.clamp(currentOutlineTransparency + increment, results.HighlightOutlineTransparency, 1)
+			self:SetProperty("OutlineTransparency", newOutlineTransparency)
+
+			local currentFillTransparency = self:GetProperty("FillTransparency") :: number
+			self:SetProperty(
+				"FillTransparency",
+				math.clamp(currentFillTransparency + increment, results.HighlightFillTransparency, 1)
+			)
+		end
+
+		local prevHit = false
+		local currentlyHit = false
+
+		--self:SetProperty("Enabled", false)
+		self:SetProperty("OutlineTransparency", 1)
+		self:SetProperty("FillTransparency", 1)
+
+		local totalFrames = 0
 		cleaner:Connect(RunService.RenderStepped, function()
-			self:SetProperty("DepthMode", results.HighlightDepthMode)
-			self:SetProperty("OutlineColor", results.HighlightOutlineColor)
-			self:SetProperty("FillColor", results.HighlightFillColor)
-			self:SetProperty("OutlineTransparency", results.HighlightOutlineTransparency)
-			self:SetProperty("FillTransparency", results.HighlightFillTransparency)
-
-			if not results.Enabled then
-				self:SetProperty("Enabled", false)
+			totalFrames += 1
+			if totalFrames % 2 ~= 0 then
 				return
 			end
 
-			self:SetProperty("Enabled", hitHighlightPrompt())
+			self:SetProperty("DepthMode", results.HighlightDepthMode)
+			self:SetProperty("OutlineColor", results.HighlightOutlineColor)
+			self:SetProperty("FillColor", results.HighlightFillColor)
 
-			if prevEnabled ~= self:GetProperty("Enabled") then
-				if self:GetProperty("Enabled") then
+			if results.Enabled then
+				self:SetProperty("Enabled", true)
+			else
+				self:SetProperty("Enabled", false)
+				currentlyHit = false
+				return
+			end
+
+			local hitResult = hitHighlightPrompt()
+			currentlyHit = hitResult
+
+			if hitResult then
+				fadeHighlight("In")
+			else
+				fadeHighlight("Out")
+			end
+
+			if prevHit ~= hitResult then
+				if hitResult then
 					hoverEnter:Fire()
 				else
 					hoverEscape:Fire()
 				end
 			end
 
-			prevEnabled = self:GetProperty("Enabled") :: boolean
+			prevHit = hitResult
 		end)
 
-		cleaner:Connect(parent.AttributeChanged, function(attribute: string)
-			if not results.Enabled then
+		local function sendClassToServer()
+			if not results.ServerClass then
 				return
 			end
 
-			if attribute ~= "HighlightEnabled" then
-				return
-			end
-
-			if self:GetProperty("Enabled") then
-				hoverEnter:Fire()
-			else
-				hoverEscape:Fire()
-			end
-		end)
+			RedEvents.Network.Client.PromptClassActivation:FireServer(results.ServerClass, parent)
+		end
 
 		local lastActivationTime = 0
 		local connection = buttonActivated:Connect(function()
@@ -174,10 +203,11 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			end
 			lastActivationTime = time()
 
-			if not self:GetProperty("Enabled") then
+			if not currentlyHit then
 				return
 			end
 
+			sendClassToServer()
 			activated:Fire()
 		end)
 

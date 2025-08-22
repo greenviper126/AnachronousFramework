@@ -77,6 +77,7 @@ end
 ]]
 function PlayerCollision.Start(self: PlayerCollision)
 	local headCollider = self._cleaner:Add(Instance.new("Part"))
+	headCollider.CollisionGroup = "DefaultOnly"
 	headCollider.Shape = Enum.PartType.Ball
 	headCollider.Size = Vector3.one * 1
 	headCollider.Transparency = 1

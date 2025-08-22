@@ -19,6 +19,7 @@ type self = {
 	base: Instance,
 
 	highlights: { Highlight },
+	highlightProperties: { [string]: any },
 
 	_cleaner: typeof(Trove.new()),
 }
@@ -36,6 +37,7 @@ function Highlighter.new(base: Instance?)
 	self.base = base
 
 	self.highlights = {}
+	self.highlightProperties = {}
 
 	self:_init()
 
@@ -96,22 +98,23 @@ function Highlighter._init(self: Highlighter)
 	elseif self.base:IsA("BasePart") then
 		AddHighlight(self.base)
 	end
+
+	local highlight = self.highlights[1]
+	for property, value in pairs(Utility.Properties.InstanceToProperties(highlight)) do
+		self.highlightProperties[property] = value
+	end
 end
 
 function Highlighter.SetProperty(self: Highlighter, property: string, value: any)
+	self.highlightProperties[property] = value
+
 	for _, highlight in pairs(self.highlights) do
 		Utility.Properties.ApplyPropertyValueToInstance(highlight, property, value)
 	end
 end
 
 function Highlighter.GetProperty(self: Highlighter, property: string): any?
-	local result = nil
-	for _, highlight in pairs(self.highlights) do
-		result = Utility.Properties.InstanceToProperties(highlight)[property]
-		break
-	end
-
-	return result
+	return self.highlightProperties[property]
 end
 
 function Highlighter.Cleanup(self: Highlighter)
