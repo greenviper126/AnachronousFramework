@@ -144,7 +144,7 @@ local function createPrompt(parent: Instance): HighlightPrompt
 		local totalFrames = 0
 		cleaner:Connect(RunService.RenderStepped, function()
 			totalFrames += 1
-			if totalFrames % 2 ~= 0 then
+			if totalFrames % 2 ~= 0 then --prob only need to check every other frame or think of a more performant solution
 				return
 			end
 
@@ -262,11 +262,17 @@ ContextActionService:BindActionAtPriority(
 
 local HighlightPrompt = {}
 
-function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Confirm" | "Deny")
+function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Neutral" | "Confirm" | "Deny")
+	local whiteAccent = GlobalInfo.COLOR_THEME.ACCENT.WHITE
 	local greenAccent = GlobalInfo.COLOR_THEME.ACCENT.GREEN
 	local redAccent = GlobalInfo.COLOR_THEME.ACCENT.RED
 
-	if preset == "Confirm" then
+	if preset == "Neutral" then
+		prompt.HighlightOutlineColor = whiteAccent
+		prompt.HighlightFillColor = Color3.new(whiteAccent.R * 1.2, whiteAccent.G * 1.2, whiteAccent.B * 1.2)
+		prompt.HighlightOutlineTransparency = 0.25
+		prompt.HighlightFillTransparency = 0.7
+	elseif preset == "Confirm" then
 		prompt.HighlightOutlineColor = greenAccent
 		prompt.HighlightFillColor = Color3.new(greenAccent.R * 1.2, greenAccent.G * 1.2, greenAccent.B * 1.2)
 		prompt.HighlightOutlineTransparency = 0.25
@@ -279,7 +285,7 @@ function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Co
 	end
 end
 
-function HighlightPrompt.Create(parent: BasePart): HighlightPrompt
+function HighlightPrompt.Create(parent: Instance): HighlightPrompt
 	return createPrompt(parent)
 end
 

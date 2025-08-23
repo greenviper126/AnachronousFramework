@@ -11,10 +11,13 @@ local cameraUtility = {}
 --[[
     Sets the camera to fist person or unlocks it.
 
+    @param weight number - priority of request
     @param set boolean - Set to first person or unlock
+
+    @return boolean - success of request
 ]]
-function cameraUtility.SetFirstPerson(set: boolean)
-	sendSignal("SetFirstPerson", set)
+function cameraUtility.SetFirstPerson(weight: number, set: boolean): boolean
+	return sendSignal("SetFirstPerson", weight, set)
 end
 
 --[[
@@ -24,6 +27,47 @@ end
 ]]
 function cameraUtility.GetFirstPerson(): boolean
 	return sendSignal("GetFirstPerson")
+end
+
+--[[
+    Tells you what the current weight/priority is.
+
+    @return number - current priority of camera
+]]
+function cameraUtility.GetCameraPriority(): number
+	return sendSignal("CameraPriorityChanged")
+end
+
+--[[
+    Tells you the current CFrame of the first person camera.
+    Also works in 3rd person.
+
+    @return CFrame - firstPerson Camera position
+]]
+function cameraUtility.GetFirstPersonCamCFrame(): CFrame
+	return sendSignal("GetFirstPersonCamCFrame")
+end
+
+--[[
+    Sets the CFrame of the camera with/without bobbing effects.
+    Automatically sets camera to scriptable.
+
+    @param weight number - priority of request
+    @param target CFrame - targetFor the camera to reach too
+
+    @return boolean - success of request
+]]
+function cameraUtility.SetScriptableTargetCFrame(weight: number, target: CFrame, bobbingStrength: number?): boolean
+	return sendSignal("SetScriptableTargetCFrame", weight, target, bobbingStrength)
+end
+
+--[[
+    Gets the CFrame of the target camera for scriptables.
+
+    @return CFrame - current TargetCFrame
+]]
+function cameraUtility.GetScriptableTargetCFrame(): CFrame
+	return sendSignal("GetScriptableTargetCFrame")
 end
 
 --[[

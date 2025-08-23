@@ -18,6 +18,7 @@ GlobalInfo.COLOR_THEME = { --Color3
 		GREEN = Color3.fromRGB(58, 180, 58),
 		BLUE = Color3.fromRGB(58, 58, 180),
 		YELLOW = Color3.fromRGB(180, 180, 58),
+		WHITE = Color3.fromRGB(243, 243, 243),
 	},
 
 	NEUTRAL = {

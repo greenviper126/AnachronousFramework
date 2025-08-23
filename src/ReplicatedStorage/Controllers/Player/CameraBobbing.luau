@@ -38,6 +38,9 @@ end
 local CameraBobber = {}
 CameraBobber.__index = CameraBobber
 CameraBobber.TAG_NAME = "CameraBobber"
+CameraBobber.FirstPersonCFrame = CFrame.new(0, 0, 0)
+CameraBobber.CameraTargetCFrame = CFrame.new(0, 0, 0)
+CameraBobber.FullBobbingStrength = 1
 
 type self = {
 	root: Part,
@@ -75,6 +78,10 @@ function CameraBobber.new(root: Part?)
 		warn("There is more than one object with the " .. CameraBobber.TAG_NAME .. " Tag")
 	end
 
+	CameraBobber.FirstPersonCFrame = CFrame.new(0, 0, 0)
+	CameraBobber.CameraTargetCFrame = CFrame.new(0, 0, 0)
+	CameraBobber.FullBobbingStrength = 1
+
 	local self = setmetatable({} :: self, CameraBobber)
 	self._cleaner = Trove.new()
 
@@ -85,19 +92,9 @@ function CameraBobber.new(root: Part?)
 	self.prevCrouch = false
 	self.isCrouched = false
 
-	self:OnStart()
 	self:Track()
 
 	return self
-end
-
---[[
-	Will turn the CameraBobber on and off with added sounds and timing.
-
-	@param self CameraBobber - object
-]]
-function CameraBobber.OnStart(self: CameraBobber)
-	--self.humanoid.CameraOffset = (self.root.CFrame + Vector3.new(0, 1, 0)):ToObjectSpace(self.head.CFrame).Position
 end
 
 --[[
@@ -148,16 +145,20 @@ function CameraBobber.GetBobbingValues(
 end
 
 --[[
-	Will turn the CameraBobber on and off with added sounds and timing.
+	Sends back the camera bobber additive CFrame
 
 	@param self CameraBobber - object
+
+	@return CFrame - adjusted CFrame
 ]]
-function CameraBobber.BobbingFrame(self: CameraBobber, delta: number)
+function CameraBobber.BobbingFrame(self: CameraBobber, delta: number, totalStrength: number?): CFrame
 	delta = delta * 30
+
+	local realStrength = totalStrength or 1
 
 	local velocity = self.root.AssemblyLinearVelocity
 	local speed = Vector3.new(velocity.X, 0, velocity.Z).Magnitude
-	local strength = IDLE_STRENGTH * (1 - (speed / GlobalInfo.MOVEMENT.SPEED.RUNNING))
+	local strength = IDLE_STRENGTH * realStrength * (1 - (speed / GlobalInfo.MOVEMENT.SPEED.RUNNING))
 
 	--setting camera height for crouch
 	if self.isCrouched ~= self.prevCrouch then
@@ -196,12 +197,20 @@ function CameraBobber.BobbingFrame(self: CameraBobber, delta: number)
 		verticalBob, horizontalBob = self:GetBobbingValues("Idle")
 	end
 
-	camera.CFrame = camera.CFrame
-		* CFrame.fromEulerAnglesXYZ(math.rad(func1 * 0.2), math.rad(func2), math.rad(func2 * 10)) --rnd bobbing
+	verticalBob = verticalBob * realStrength
+	horizontalBob = horizontalBob * realStrength
+
+	local bobCFrame = CFrame.fromEulerAnglesXYZ(math.rad(func1 * 0.2), math.rad(func2), math.rad(func2 * 10)) --rnd bobbing
 		* CFrame.fromEulerAnglesXYZ(0, 0, math.rad(func3)) --turning
 		* CFrame.fromEulerAnglesXYZ(verticalBob, horizontalBob, 0) -- bobbing
 
-	func3 = lerp(func3, math.clamp(UserInputService:GetMouseDelta().X, -2.5, 2.5) * TURN_STRENGTH, 0.25 * delta) -- turn func
+	func3 = lerp(
+		func3,
+		math.clamp(UserInputService:GetMouseDelta().X, -2.5, 2.5) * TURN_STRENGTH * realStrength,
+		0.25 * delta
+	) -- turn func
+
+	return bobCFrame
 end
 
 --[[
@@ -227,25 +236,40 @@ function CameraBobber.Track(self: CameraBobber)
 		local isFirstPerson = player:GetAttribute("IsFirstPerson")
 
 		if isFirstPerson then
+			camera.CameraType = Enum.CameraType.Custom
+
 			self._cameraCleaner = self._cleaner:Extend()
-
-			self._cameraCleaner:BindToRenderStep(
-				"CustomCamera",
-				Enum.RenderPriority.Camera.Value + 1,
-				function(delta: number)
-					self:BobbingFrame(delta)
-				end
-			)
-
-			self._cameraCleaner:Add(function()
-				RunService:UnbindFromRenderStep("CustomCamera")
-			end)
 		else
 			if self._cameraCleaner then
 				self._cameraCleaner:Destroy()
 			end
+
+			camera.CameraType = Enum.CameraType.Scriptable
 		end
 	end
+
+	local offset = self.root.CFrame:ToObjectSpace(camera.CFrame)
+	self._cleaner:Connect(RunService.Heartbeat, function()
+		CameraBobber.FirstPersonCFrame = self.root.CFrame * offset
+	end)
+
+	local strength = 1
+	self._cleaner:BindToRenderStep("CustomCamera", Enum.RenderPriority.Camera.Value + 1, function(delta: number)
+		local isFirstPerson = player:GetAttribute("IsFirstPerson")
+		local additiveStrength = isFirstPerson and 0.01 or -0.01
+		strength = math.clamp(strength + additiveStrength, 0, 1)
+
+		if isFirstPerson then
+			camera.CFrame = camera.CFrame * self:BobbingFrame(delta, strength)
+		else
+			camera.CFrame = CameraBobber.CameraTargetCFrame
+				* self:BobbingFrame(delta, strength * CameraBobber.FullBobbingStrength)
+		end
+	end)
+
+	self._cleaner:Add(function()
+		RunService:UnbindFromRenderStep("CustomCamera")
+	end)
 
 	setCameraType()
 	self._cleaner:Connect(player.AttributeChanged, function(attribute: string)
@@ -282,13 +306,51 @@ end)
 -------------------------------------------------------------------------------------------
 
 local receiveSignal = RedEvents.SystemConnect.CreateReceiver("CameraBobbing")
+local cameraWeight = 0
 
-receiveSignal("SetFirstPerson", function(set)
-	player:SetAttribute("IsFirstPerson", set)
+local function SetFirstPerson(weight: number, set: boolean): boolean
+	if cameraWeight > weight then
+		return false
+	end
+	cameraWeight = set and 0 or weight
+
+	if player:GetAttribute("IsFirstPerson") :: boolean ~= set then
+		player:SetAttribute("IsFirstPerson", set)
+	end
+
+	return true
+end
+
+receiveSignal("SetFirstPerson", function(weight, set): boolean
+	return SetFirstPerson(weight, set)
 end)
 
 receiveSignal("GetFirstPerson", function(): boolean
 	return player:GetAttribute("IsFirstPerson") :: boolean
+end)
+
+receiveSignal("GetCameraPriority", function(): number
+	return cameraWeight
+end)
+
+receiveSignal("GetFirstPersonCamCFrame", function(): CFrame
+	return CameraBobber.FirstPersonCFrame
+end)
+
+receiveSignal("SetScriptableTargetCFrame", function(weight, target, strength): boolean
+	local success = SetFirstPerson(weight, false)
+	if not success then
+		return false
+	end
+
+	CameraBobber.CameraTargetCFrame = target
+	CameraBobber.FullBobbingStrength = strength or 1
+
+	return true
+end)
+
+receiveSignal("GetScriptableTargetCFrame", function()
+	return CameraBobber.CameraTargetCFrame
 end)
 
 receiveSignal("ConnectFunctionToFirstPersonType", function(func: () -> ())
