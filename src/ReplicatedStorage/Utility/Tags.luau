@@ -6,6 +6,8 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local diedSignal = nil
+
 --[[
 	Get instances with all specified tags
 
@@ -141,6 +143,15 @@ local function setObjectListener<T>(class: any): (() -> (), () -> { [Instance]: 
 end
 
 --[[
+	Logic used in tag character connection for on playerDeath.
+
+	@param died RBXScriptSignal - determines when the player dies
+]]
+local function setCharacterDeathConnection(died: RBXScriptSignal)
+	diedSignal = died
+end
+
+--[[
 	Will add a tag to the player character root when they spawn in
 
 	This serves as the replacement for player character scripts
@@ -162,51 +173,36 @@ local function tagCharacterConnection(tag: string, tagPlayer: Player?): () -> ()
 		return function() end
 	end
 
-	local diedConnection: RBXScriptConnection? = nil
-	local function tagCharacter()
-		if not player or not player.Character then
+	local function getRoot(): BasePart?
+		local character = player.Character
+		if not character then
 			return
 		end
 
-		local root = player.Character:FindFirstChild("HumanoidRootPart")
-		if not root then
-			warn("Could not find root to attach " .. tag .. " Tag.")
-			return
-		end
-
-		local humanoid = player.Character:FindFirstChild("Humanoid") :: Humanoid
-		if not humanoid then
-			return
-		end
-
-		if diedConnection then
-			diedConnection:Disconnect()
-		end
-
-		diedConnection = humanoid.HealthChanged:Connect(function() -- this may need to change in the future
-			if humanoid.Health > 1 then
-				return
-			end
-
-			print("you died!!!")
-			root:RemoveTag(tag)
-
-			if diedConnection then
-				diedConnection:Disconnect()
-			end
-		end)
-
-		root:AddTag(tag)
+		return character:FindFirstChild("HumanoidRootPart") :: BasePart?
 	end
 
-	tagCharacter()
-	local characterConnection = player.CharacterAdded:Connect(function()
-		tagCharacter()
+	assert(diedSignal, "No DiedSignal found For player!")
+
+	local function setDeath(dead: boolean)
+		local root = getRoot()
+		assert(root, "Could not find root for DiedSignal Connection!, Player: " .. player.Name)
+
+		if dead then
+			print("you died!!!")
+			root:RemoveTag(tag)
+		else
+			print("your alive!!!")
+			root:AddTag(tag)
+		end
+	end
+
+	setDeath(false)
+	local diedConnection = diedSignal:Connect(function(dead: boolean) -- this may need to change in the future
+		setDeath(dead)
 	end)
 
 	return function()
-		characterConnection:Disconnect()
-
 		if diedConnection then
 			diedConnection:Disconnect()
 		end
@@ -230,5 +226,6 @@ return {
 	GetAny = getAny,
 	SetObjectListener = setObjectListener,
 	TagCharacterConnection = tagCharacterConnection,
+	SetCharacterDeathConnection = setCharacterDeathConnection,
 	GetUniqueClass = getUniqueClass,
 }

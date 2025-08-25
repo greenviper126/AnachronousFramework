@@ -88,7 +88,11 @@ return function()
 
 		LoadFromFile(managers)
 	elseif RunService:IsClient() then
-		task.wait(2) --let instances load in
+		repeat --let instances load in
+			task.wait()
+		until game:IsLoaded()
+
+		task.wait(1)
 
 		local ReplicatedStorage = game:GetService("ReplicatedStorage")
 		local controllers = ReplicatedStorage:WaitForChild("Controllers")

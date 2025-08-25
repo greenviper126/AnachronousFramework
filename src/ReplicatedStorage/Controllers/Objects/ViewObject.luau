@@ -1,7 +1,6 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local Input = require(ReplicatedStorage.Packages.input)
@@ -23,6 +22,8 @@ type self = {
 	model: Model,
 	focusCamera: BasePart,
 	focusPart: BasePart,
+
+	priorityIsHigher: boolean,
 
 	prompt: HighlightPrompt.HighlightPrompt,
 
@@ -47,6 +48,8 @@ function ViewObject.new(model: Model)
 
 	self.model = model
 	self.focusPart = model.PrimaryPart
+
+	self.priorityIsHigher = false
 
 	self.focusCamera = viewCamera
 	self.focusCamera.Transparency = 1
@@ -97,6 +100,10 @@ function ViewObject.TweenCFrame(self: ViewObject, start: CFrame, target: CFrame,
 	end)
 
 	repeat
+		if CameraUtility.GetCameraPriority() > 30 then
+			break
+		end
+
 		task.wait()
 	until tween.PlaybackState == Enum.PlaybackState.Completed
 
@@ -110,17 +117,6 @@ end
 	@param self ViewObject - object
 ]]
 function ViewObject._Listen(self: ViewObject)
-	local priorityIsHigher = false
-	self._cleaner:Connect(RunService.Heartbeat, function()
-		local cameraPriority = CameraUtility.GetCameraPriority()
-		if cameraPriority > 30 then
-			priorityIsHigher = true
-		end
-	end)
-
-	--TODO
-	--need to clean this up if the player dies
-
 	self._cleaner:Connect(self.prompt.Activated, function()
 		self.prompt.Enabled = false
 
@@ -134,7 +130,7 @@ function ViewObject._Listen(self: ViewObject)
 		--exit
 		local foundInput = false
 		repeat
-			if priorityIsHigher then
+			if CameraUtility.GetCameraPriority() > 30 then
 				break
 			end
 

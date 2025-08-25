@@ -308,6 +308,8 @@ end)
 local receiveSignal = RedEvents.SystemConnect.CreateReceiver("CameraBobbing")
 local cameraWeight = 0
 
+-- TODO need to write code that resets the camera back to firstPerson on death and puts camera weight to high number.
+
 local function SetFirstPerson(weight: number, set: boolean): boolean
 	if cameraWeight > weight then
 		return false
