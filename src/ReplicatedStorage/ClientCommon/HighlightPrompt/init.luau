@@ -52,6 +52,8 @@ local function createPrompt(parent: Instance): HighlightPrompt
 
 	local base = parent:IsA("BasePart") and parent or parent:FindFirstAncestorWhichIsA("BasePart")
 
+	local self = Highlighter.new(parent)
+
 	local results = {
 		ClickablePrompt = true,
 		Enabled = true,
@@ -69,14 +71,12 @@ local function createPrompt(parent: Instance): HighlightPrompt
 		HoverEscape = hoverEscape.Event,
 		Activated = activated.Event,
 
-		Destroy = function(self: HighlightPrompt)
-			self:Destroy()
+		Destroy = function()
+			self._cleaner:Destroy()
 		end,
 	} :: HighlightPrompt
 
 	if base then
-		local self = Highlighter.new(parent)
-
 		parent:AddTag("HighlightHover")
 
 		local function foundTaggedObject(object: BasePart)

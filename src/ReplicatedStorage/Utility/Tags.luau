@@ -182,7 +182,15 @@ local function tagCharacterConnection(tag: string, tagPlayer: Player?): () -> ()
 		return character:FindFirstChild("HumanoidRootPart") :: BasePart?
 	end
 
-	assert(diedSignal, "No DiedSignal found For player!")
+	local startTime = time()
+	repeat
+		task.wait()
+	until diedSignal or time() - startTime > 10
+
+	assert(
+		diedSignal,
+		"No DiedSignal found For player after searching for " .. tostring(time() - startTime) .. " seconds!"
+	)
 
 	local function setDeath(dead: boolean)
 		local root = getRoot()

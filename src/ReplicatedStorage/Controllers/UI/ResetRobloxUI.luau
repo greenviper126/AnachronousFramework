@@ -8,7 +8,7 @@ local function setScreen(boolean)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, boolean)
 
 	--this causes an error sometimes and idk why yet
-	--StarterGui:SetCore("ResetButtonCallback", boolean)
+	StarterGui:SetCore("ResetButtonCallback", boolean)
 end
 
 task.spawn(function()
