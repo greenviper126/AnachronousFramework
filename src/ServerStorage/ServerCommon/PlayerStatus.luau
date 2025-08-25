@@ -92,6 +92,14 @@ function PlayerStatus.GetHealth(player: Player): number
 end
 
 --[[
+    Get the max health all players can have.
+
+]]
+function PlayerStatus.GetMaxHealth()
+	return PLAYER_MAX_HEALTH
+end
+
+--[[
     Add from current health of specified player.
     negative numbers damage player.
 
