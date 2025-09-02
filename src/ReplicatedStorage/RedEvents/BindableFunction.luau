@@ -106,7 +106,12 @@ local function connectSystem(class: string)
 	return connect
 end
 
+local function readBindables(): { [string]: { [string]: boolean } }
+	return registeredFunctions
+end
+
 return {
 	FireSystem = fireSystem,
 	ConnectSystem = connectSystem,
+	ReadBindables = readBindables,
 }

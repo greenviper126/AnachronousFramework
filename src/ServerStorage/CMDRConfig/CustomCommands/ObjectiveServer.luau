@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Set current Server Objective.
+]]
+
 local ServerStorage = game:GetService("ServerStorage")
 
 local Objective = require(ServerStorage.ServerCommon.Objective)

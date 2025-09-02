@@ -114,6 +114,7 @@ local RedSignalNetwork = {
 	SystemConnect = {
 		CreateSender = BindableFunction.FireSystem,
 		CreateReceiver = BindableFunction.ConnectSystem,
+		ReadBindables = BindableFunction.ReadBindables,
 	},
 	Ratelimit = Ratelimit,
 	NewSignal = Signal,

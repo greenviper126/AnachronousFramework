@@ -1,3 +1,9 @@
+--!strict
+
+--[[
+	Send InfoBox to specified Players.
+]]
+
 local ServerStorage = game:GetService("ServerStorage")
 
 local InfoBox = require(ServerStorage.ServerCommon.InfoBox)

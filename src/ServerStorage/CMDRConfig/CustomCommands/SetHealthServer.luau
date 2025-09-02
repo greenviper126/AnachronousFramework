@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Set specified players health.
+]]
+
 local ServerStorage = game:GetService("ServerStorage")
 
 local PlayerStatusUtility = require(ServerStorage.ServerCommon.PlayerStatusUtility)

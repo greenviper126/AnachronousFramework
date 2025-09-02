@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Kill specified Players.
+]]
+
 local ServerStorage = game:GetService("ServerStorage")
 
 local PlayerStatusUtility = require(ServerStorage.ServerCommon.PlayerStatusUtility)
