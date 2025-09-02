@@ -2,10 +2,10 @@
 
 local ServerStorage = game:GetService("ServerStorage")
 
-local Task = require(ServerStorage.ServerCommon.Task)
+local Objective = require(ServerStorage.ServerCommon.Objective)
 
 local function update(name: string, description: string)
-	local result = Task.Update(name, description)
+	local result = Objective.Update(name, description)
 
 	if result then
 		return ("Objective was successfully updated using name %s."):format(name)
@@ -16,18 +16,18 @@ end
 
 return function(_data, action, name, description)
 	if action == "New" then
-		Task.New(name, description)
+		Objective.New(name, description)
 
 		return ("A new Objective was added named %s."):format(name)
 	elseif action == "Update" then
-		local fetchedName = Task.FetchCurrentName()
+		local fetchedName = Objective.FetchCurrentName()
 		if fetchedName then
 			return update(fetchedName, name)
 		else
 			return "There currently is no objective to update!"
 		end
 	elseif action == "Remove" then
-		Task.Remove()
+		Objective.Remove()
 
 		return "The current Objective was removed."
 	end

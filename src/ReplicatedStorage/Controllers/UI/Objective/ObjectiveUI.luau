@@ -6,11 +6,11 @@ local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
 
 return {
 	New = function(parent: Instance)
-		local taskUI = Instance.new("ScreenGui")
-		taskUI.Name = "TaskUI"
-		taskUI.DisplayOrder = 5
-		taskUI.ResetOnSpawn = false
-		taskUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		local objectiveUI = Instance.new("ScreenGui")
+		objectiveUI.Name = "ObjectiveUI"
+		objectiveUI.DisplayOrder = 5
+		objectiveUI.ResetOnSpawn = false
+		objectiveUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 		local uIPadding = Instance.new("UIPadding")
 		uIPadding.Name = "UIPadding"
@@ -18,7 +18,7 @@ return {
 		uIPadding.PaddingLeft = UDim.new(0, 5)
 		uIPadding.PaddingRight = UDim.new(0, 5)
 		uIPadding.PaddingTop = UDim.new(0, 5)
-		uIPadding.Parent = taskUI
+		uIPadding.Parent = objectiveUI
 
 		local holder = Instance.new("CanvasGroup")
 		holder.Name = "Holder"
@@ -99,10 +99,10 @@ return {
 
 		divider.Parent = holder
 
-		holder.Parent = taskUI
+		holder.Parent = objectiveUI
 
-		taskUI.Parent = parent
+		objectiveUI.Parent = parent
 
-		return taskUI, holder, description, divider
+		return objectiveUI, holder, description, divider
 	end,
 }

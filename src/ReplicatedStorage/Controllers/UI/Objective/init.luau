@@ -16,12 +16,12 @@ local Sounds = require(ReplicatedStorage.Common.Sounds)
 
 local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
-local taskUI = require(script:WaitForChild("TaskUI"))
+local ObjectiveUI = require(script.ObjectiveUI)
 
-local Task = {}
-Task.__index = Task
-Task.TAG_NAME = "Task"
-Task.PrevNameUsed = nil :: string?
+local Objective = {}
+Objective.__index = Objective
+Objective.TAG_NAME = "Objective"
+Objective.PrevNameUsed = nil :: string?
 
 type self = {
 	gui: ScreenGui,
@@ -40,22 +40,22 @@ type self = {
 	_cleaner: typeof(Trove.new()),
 }
 
-export type Task = typeof(setmetatable({} :: self, Task))
+export type Objective = typeof(setmetatable({} :: self, Objective))
 
 --[[
 	Constructor
 
 	@return self - the new object
 ]]
-function Task.new()
-	if not Utility.Tags.GetUnique(Task.TAG_NAME) then
-		warn("There is more than one object with the " .. Task.TAG_NAME .. " Tag")
+function Objective.new()
+	if not Utility.Tags.GetUnique(Objective.TAG_NAME) then
+		warn("There is more than one object with the " .. Objective.TAG_NAME .. " Tag")
 	end
 
-	local self = setmetatable({} :: self, Task)
+	local self = setmetatable({} :: self, Objective)
 	self._cleaner = Trove.new()
 
-	local gui, canvas, description, divider = taskUI.New(player.PlayerGui)
+	local gui, canvas, description, divider = ObjectiveUI.New(player.PlayerGui)
 	self.gui = gui
 	self.canvas = canvas
 	self.description = description
@@ -69,23 +69,23 @@ function Task.new()
 end
 
 --[[
-	Read player task data.
+	Read player Objective data.
 
-	@return string? - name of task
-	@return string? - description of task
+	@return string? - name of Objective
+	@return string? - description of Objective
 ]]
-function Task.GetData(): (string?, string?)
-	return Players:GetAttribute("_TaskName") :: string, Players:GetAttribute("_Task") :: string
+function Objective.GetData(): (string?, string?)
+	return Players:GetAttribute("_ObjectiveName") :: string, Players:GetAttribute("_Objective") :: string
 end
 
 --[[
-	Creates a new task
+	Creates a new Objective
 
-	@param self Task - object
+	@param self Objective - object
 
 	@return number - wait time
 ]]
-function Task.FadeUI(self: Task, direction: "In" | "Out"): number
+function Objective.FadeUI(self: Objective, direction: "In" | "Out"): number
 	local transparencyValue = direction == "In" and 0 or 1
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
 
@@ -97,11 +97,11 @@ end
 --[[
 	Animates the separator line
 
-	@param self Task - object
+	@param self Objective - object
 
 	@return number - wait time
 ]]
-function Task.AnimateLine(self: Task, direction: "In" | "Out"): number
+function Objective.AnimateLine(self: Objective, direction: "In" | "Out"): number
 	local sizeValue = direction == "In" and 1 or 0.001
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
 
@@ -111,13 +111,13 @@ function Task.AnimateLine(self: Task, direction: "In" | "Out"): number
 end
 
 --[[
-	Creates a new task
+	Creates a new Objective
 
-	@param self Task - object
-	@param name string? - name of the task
+	@param self Objective - object
+	@param name string? - name of the Objective
 	@param description string? - description of the text
 ]]
-function Task.NewTask(self: Task, name: string?, description: string?)
+function Objective.NewObjective(self: Objective, name: string?, description: string?)
 	if self.newObjectiveThread then
 		task.cancel(self.newObjectiveThread)
 	end
@@ -126,17 +126,17 @@ function Task.NewTask(self: Task, name: string?, description: string?)
 		--fade out
 
 		if self.prevName then
-			self:RemoveTask()
+			self:RemoveObjective()
 			task.wait(1)
 		end
 
-		--add new task
+		--add new Objective
 		self.prevName = name
 		self.prevDescription = description
 		self.description.Text = description or ""
 
-		if Task.PrevNameUsed ~= name then -- no sound if you respawn unless its new
-			Sounds.PlaySoundByName("NewTask")
+		if Objective.PrevNameUsed ~= name then -- no sound if you respawn unless its new
+			Sounds.PlaySoundByName("NewObjective")
 		end
 
 		--fade in
@@ -149,11 +149,11 @@ function Task.NewTask(self: Task, name: string?, description: string?)
 end
 
 --[[
-	Updates the current task.
+	Updates the current Objective.
 
-	@param self Task - object
+	@param self Objective - object
 ]]
-function Task.UpdateTask(self: Task, name: string?, description: string?)
+function Objective.UpdateObjective(self: Objective, name: string?, description: string?)
 	if self.prevName ~= name then
 		return
 	end
@@ -162,11 +162,11 @@ function Task.UpdateTask(self: Task, name: string?, description: string?)
 end
 
 --[[
-	Removes the current task.
+	Removes the current Objective.
 
-	@param self Task - object
+	@param self Objective - object
 ]]
-function Task.RemoveTask(self: Task, quite: boolean?)
+function Objective.RemoveObjective(self: Objective, quite: boolean?)
 	if self.removeObjectiveThread then
 		task.cancel(self.removeObjectiveThread)
 	end
@@ -175,7 +175,7 @@ function Task.RemoveTask(self: Task, quite: boolean?)
 	self.prevDescription = nil
 
 	if not quite and self.canvas.GroupTransparency == 0 then
-		Sounds.PlaySoundByName("RemoveTask")
+		Sounds.PlaySoundByName("RemoveObjective")
 	end
 
 	self.removeObjectiveThread = task.spawn(function()
@@ -188,49 +188,49 @@ function Task.RemoveTask(self: Task, quite: boolean?)
 end
 
 --[[
-	Listens to player service for any changes in the task
+	Listens to player service for any changes in the Objective
 
-	@param self Task - object
+	@param self Objective - object
 ]]
-function Task.Listen(self: Task)
+function Objective.Listen(self: Objective)
 	local function addOrRemove()
-		local description = Players:GetAttribute("_Task") :: string?
-		local name = Players:GetAttribute("_TaskName") :: string?
+		local description = Players:GetAttribute("_Objective") :: string?
+		local name = Players:GetAttribute("_ObjectiveName") :: string?
 
 		if not name then
-			self:RemoveTask()
+			self:RemoveObjective()
 		elseif self.prevName ~= name then
-			self:NewTask(name, description)
+			self:NewObjective(name, description)
 		end
 	end
 
 	local function update()
-		local description = Players:GetAttribute("_Task") :: string?
-		local name = Players:GetAttribute("_TaskName") :: string?
+		local description = Players:GetAttribute("_Objective") :: string?
+		local name = Players:GetAttribute("_ObjectiveName") :: string?
 
 		if self.prevName == name and self.prevDescription ~= description then
-			self:UpdateTask(name, description)
+			self:UpdateObjective(name, description)
 		end
 	end
 
 	addOrRemove()
-	self._cleaner:Connect(Players:GetAttributeChangedSignal("_TaskName"), function()
+	self._cleaner:Connect(Players:GetAttributeChangedSignal("_ObjectiveName"), function()
 		addOrRemove()
 	end)
 
-	self._cleaner:Connect(Players:GetAttributeChangedSignal("_Task"), function()
+	self._cleaner:Connect(Players:GetAttributeChangedSignal("_Objective"), function()
 		update()
 	end)
 end
 
 --[[
-	Cleans up the Task object.
+	Cleans up the Objective object.
 
-	@param self Task - object
+	@param self Objective - object
 ]]
-function Task.Cleanup(self: Task)
-	Task.PrevNameUsed = self.prevName
-	self:RemoveTask(true)
+function Objective.Cleanup(self: Objective)
+	Objective.PrevNameUsed = self.prevName
+	self:RemoveObjective(true)
 
 	task.wait(1.2)
 
@@ -239,9 +239,9 @@ end
 
 -------------------------------------------------------------------------------------------
 
-local _characterTagConnection = Utility.Tags.TagCharacterConnection(Task.TAG_NAME)
-local _cleanup, _objects = Utility.Tags.SetObjectListener(Task)
-local _uniqueClass = Utility.Tags.GetUniqueClass(Task.TAG_NAME, _objects)
+local _characterTagConnection = Utility.Tags.TagCharacterConnection(Objective.TAG_NAME)
+local _cleanup, _objects = Utility.Tags.SetObjectListener(Objective)
+local _uniqueClass = Utility.Tags.GetUniqueClass(Objective.TAG_NAME, _objects)
 
 -------------------------------------------------------------------------------------------
 
