@@ -6,6 +6,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GlobalInfo = require(ReplicatedStorage.GlobalInfo)
 local RedEvents = require(ReplicatedStorage.RedEvents)
 
+--[[
+    Tools for sending Info Lines to specified Players with specified info.
+]]
 local InfoBox = {}
 
 --[[

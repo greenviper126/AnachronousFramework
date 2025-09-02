@@ -2,6 +2,9 @@
 
 local Players = game:GetService("Players")
 
+--[[
+    Tools for setting the current Objective for all Players.
+]]
 local Objective = {}
 
 --[[

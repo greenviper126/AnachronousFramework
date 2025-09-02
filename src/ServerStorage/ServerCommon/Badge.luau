@@ -6,6 +6,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Promise = require(ReplicatedStorage.Packages.promise)
 
+--[[
+	Tools for finding Badges and Giving them to Players.
+]]
 local Badge = {}
 
 --[[

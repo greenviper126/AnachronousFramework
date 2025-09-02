@@ -6,7 +6,10 @@ local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local sendSignal = RedEvents.SystemConnect.CreateSender("HighlightPromptServer")
 
-local HighlightPrompt = {}
+--[[
+	Utility for listening to local Player Activating HighlightPrompts from Server if a class was set Locally.
+]]
+local HighlightPromptUtility = {}
 
 --[[
 	This is for listening to players activating prompts on the server
@@ -18,8 +21,8 @@ local HighlightPrompt = {}
 
 	@return (Player) -> () - cleanup
 ]]
-function HighlightPrompt.ListenToClass(class: string, instance: Instance, onActivation: (Player) -> ()): () -> ()
+function HighlightPromptUtility.ListenToClass(class: string, instance: Instance, onActivation: (Player) -> ()): () -> ()
 	return sendSignal("ListenToClass", class, instance, onActivation)
 end
 
-return HighlightPrompt
+return HighlightPromptUtility

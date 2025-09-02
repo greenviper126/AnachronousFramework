@@ -6,7 +6,10 @@ local RedEvents = require(ReplicatedStorage.RedEvents)
 
 local sendSignal = RedEvents.SystemConnect.CreateSender("PlayerStatusServer")
 
-local PlayerStatus = {}
+--[[
+    Utility Module for checking a Players current stats.
+]]
+local PlayerStatusUtility = {}
 
 --[[
     Set the current health of the specified player.
@@ -14,7 +17,7 @@ local PlayerStatus = {}
     @param player Player - player to set health
     @param amount number - amount of health to set
 ]]
-function PlayerStatus.SetHealth(player: Player, amount: number)
+function PlayerStatusUtility.SetHealth(player: Player, amount: number)
 	sendSignal("SetHealth", player, amount)
 end
 
@@ -25,7 +28,7 @@ end
 
     @return number - amount of current health
 ]]
-function PlayerStatus.GetHealth(player: Player): number
+function PlayerStatusUtility.GetHealth(player: Player): number
 	return sendSignal("GetHealth", player)
 end
 
@@ -33,7 +36,7 @@ end
     Get the max health all players can have.
 
 ]]
-function PlayerStatus.GetMaxHealth()
+function PlayerStatusUtility.GetMaxHealth()
 	return sendSignal("GetMaxHealth")
 end
 
@@ -45,7 +48,7 @@ end
 
     @return number - amount of health to add
 ]]
-function PlayerStatus.AddHealth(player: Player, amount: number)
+function PlayerStatusUtility.AddHealth(player: Player, amount: number)
 	sendSignal("AddHealth", player, amount)
 end
 
@@ -56,7 +59,7 @@ end
 
     @return boolean - current death status
 ]]
-function PlayerStatus.GetDeadStatus(player: Player): boolean
+function PlayerStatusUtility.GetDeadStatus(player: Player): boolean
 	return sendSignal("GetDeadStatus", player)
 end
 
@@ -65,7 +68,7 @@ end
 
     @param player Player - player to kill
 ]]
-function PlayerStatus.KillPlayer(player: Player)
+function PlayerStatusUtility.KillPlayer(player: Player)
 	sendSignal("KillPlayer", player)
 end
 
@@ -77,8 +80,8 @@ end
 
     @return "Crouch" | "Walk" | "Sprint" - current player state
 ]]
-function PlayerStatus.CurrentMovementState(player: Player): "Crouch" | "Walk" | "Sprint"
+function PlayerStatusUtility.CurrentMovementState(player: Player): "Crouch" | "Walk" | "Sprint"
 	return sendSignal("CurrentMovementState", player)
 end
 
-return PlayerStatus
+return PlayerStatusUtility
