@@ -16,19 +16,11 @@ RedEvents.Network.Client.PromptClassActivation:OnServer(function(player: Player,
 	classActivated:Fire(player, class, instance)
 end)
 
-local HighlightPrompt = {}
+---------------------------------------------------------------------------------------
 
---[[
-	This is for listening to players activating prompts on the server
-	more meant for objects like vents, doors, etc
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("HighlightPromptServer")
 
-	@param class string - name of the class to track
-	@param instance Instance - specific instance with class
-	@param onActivation () -> () - function to run when player clicks a ClassPrompt
-
-	@return (Player) -> () - cleanup
-]]
-function HighlightPrompt.ListenToClass(class: string, instance: Instance, onActivation: (Player) -> ()): () -> ()
+receiveSignal("ListenToClass", function(class: string, instance: Instance, onActivation: (Player) -> ()): () -> ()
 	return classActivated:Connect(function(player, newClass, newInstance)
 		if newClass ~= class or newInstance ~= instance then
 			return
@@ -36,6 +28,6 @@ function HighlightPrompt.ListenToClass(class: string, instance: Instance, onActi
 
 		onActivation(player)
 	end)
-end
+end)
 
-return HighlightPrompt
+return {}

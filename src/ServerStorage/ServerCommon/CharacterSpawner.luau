@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	this is old code, this may get merged with PlayerStatus
+]]
+
 local Players = game:GetService("Players")
 local ServerStorage = game:GetService("ServerStorage")
 

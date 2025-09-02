@@ -2,12 +2,12 @@
 
 local ServerStorage = game:GetService("ServerStorage")
 
-local PlayerStatus = require(ServerStorage.ServerCommon.PlayerStatus)
+local PlayerStatusUtility = require(ServerStorage.ServerCommon.PlayerStatusUtility)
 
 return function(_data, players)
 	local names = {}
 	for _, player in pairs(players) do
-		PlayerStatus.KillPlayer(player)
+		PlayerStatusUtility.KillPlayer(player)
 		table.insert(names, player.Name)
 	end
 

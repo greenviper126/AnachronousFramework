@@ -9,7 +9,7 @@ local Promise = require(ReplicatedStorage.Packages.promise)
 local Badge = {}
 
 --[[
-	badge id's that can be used in the give function
+	Badge ID's for the game.
 ]]
 Badge.Badges = {
 	JoinedTheGame = 00000,
@@ -17,7 +17,7 @@ Badge.Badges = {
 }
 
 --[[
-	Attempts to give the given badge to the given player
+	Attempts to give the given badge to the given player.
 
 	@param player Player - The player to give the badge too
 	@param badgeId number - The id of the badge
@@ -40,13 +40,13 @@ function Badge.Give(player: Player, badgeId: number, attempts: number?)
 end
 
 --[[
-	Similar to give function but gives badges to all current players
+	Similar to give function but gives badges to all current players.
 	
 	@param badgeId number - The id of the badge
 	@param attempts number - Amount of times to attempt the badge if failed (defaults to 5)
 ]]
 function Badge.GiveAll(badgeId: number, attempts: number?)
-	for player in Players:GetPlayers() do
+	for _, player in Players:GetPlayers() do
 		Badge.Give(player, badgeId, attempts)
 	end
 end

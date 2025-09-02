@@ -2,6 +2,10 @@
 
 local PLAYER_MAX_HEALTH = 100
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local RedEvents = require(ReplicatedStorage.RedEvents)
+
 local Players = game:GetService("Players")
 
 function SetHealth(player: Player, amount: number)
@@ -68,79 +72,37 @@ end)
 
 ---------------------------------------------------------------------------------------
 
-local PlayerStatus = {}
+local receiveSignal = RedEvents.SystemConnect.CreateReceiver("PlayerStatusServer")
 
---[[
-    Set the current health of the specified player.
-
-    @param player Player - player to set health
-    @param amount number - amount of health to set
-]]
-function PlayerStatus.SetHealth(player: Player, amount: number)
+receiveSignal("SetHealth", function(player: Player, amount: number)
 	SetHealth(player, amount)
-end
+end)
 
---[[
-    Get the current health of the specified player.
-
-    @param player Player - player to get health
-
-    @return number - amount of current health
-]]
-function PlayerStatus.GetHealth(player: Player): number
+receiveSignal("GetHealth", function(player: Player): number
 	return GetHealth(player)
-end
+end)
 
---[[
-    Get the max health all players can have.
-
-]]
-function PlayerStatus.GetMaxHealth()
+receiveSignal("GetMaxHealth", function(): number
 	return PLAYER_MAX_HEALTH
-end
+end)
 
---[[
-    Add from current health of specified player.
-    negative numbers damage player.
-
-    @param player Player - player to get health
-
-    @return number - amount of health to add
-]]
-function PlayerStatus.AddHealth(player: Player, amount: number)
+receiveSignal("AddHealth", function(player: Player, amount: number)
 	AddHealth(player, amount)
-end
+end)
 
---[[
-    Checks if player is currently dead.
-
-    @param player Player - player to check death
-
-    @return boolean - current death status
-]]
-function PlayerStatus.GetDeadStatus(player: Player): boolean
+receiveSignal("GetDeadStatus", function(player: Player): boolean
 	return GetDeadStatus(player)
-end
+end)
 
---[[
-    Instantly Kills the specified player.
-
-    @param player Player - player to kill
-]]
-function PlayerStatus.KillPlayer(player: Player)
+receiveSignal("KillPlayer", function(player: Player)
 	KillPlayer(player)
-end
+end)
 
---[[
-    Gets the current walk state of the specified player.
-    This does not check if they are moving or not.
-
-    @param player Player - player to kill
-
-    @return "Crouch" | "Walk" | "Sprint" - current player state
-]]
-function PlayerStatus.CurrentMovementState(player: Player): "Crouch" | "Walk" | "Sprint"
+receiveSignal("CurrentMovementState", function(player: Player): "Crouch" | "Walk" | "Sprint"
 	return "Walk" -- logic will be added in later if this even gets used.
-end
+end)
 
-return PlayerStatus
+--TODO
+--option to load player and to set spawn points.
+
+return {}

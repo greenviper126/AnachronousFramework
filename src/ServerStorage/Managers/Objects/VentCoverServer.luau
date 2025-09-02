@@ -16,7 +16,7 @@ local Trove = require(ReplicatedStorage.Packages.trove)
 local Sounds = require(ReplicatedStorage.Common.Sounds)
 local Utility = require(ReplicatedStorage.Utility)
 
-local HighlightPrompt = require(ServerStorage.ServerCommon.HighlightPrompt)
+local HighlightPromptUtility = require(ServerStorage.ServerCommon.HighlightPromptUtility)
 
 local VentCover = {}
 VentCover.__index = VentCover
@@ -56,7 +56,7 @@ end
 	@param self VentCover - object
 ]]
 function VentCover._MonitorActivation(self: VentCover)
-	local cleaner = HighlightPrompt.ListenToClass(VentCover.TAG_NAME, self.base, function(_player: Player)
+	local cleaner = HighlightPromptUtility.ListenToClass(VentCover.TAG_NAME, self.base, function(_player: Player)
 		if self.base:GetAttribute("VentActivated") then
 			return
 		end
