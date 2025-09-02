@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Initializes players Health and adjusts Health.
+]]
+
 local PLAYER_MAX_HEALTH = 100
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

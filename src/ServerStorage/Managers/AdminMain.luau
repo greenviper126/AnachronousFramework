@@ -1,7 +1,7 @@
 --!strict
 
 --[[
-    All the logic that determines if your an admin or not should  go here
+    All the logic that determines if your an admin or not.
 ]]
 
 local Players = game:GetService("Players")

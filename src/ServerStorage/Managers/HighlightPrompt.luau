@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Initializes HighlightPrompt for Server side use.
+]]
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RedEvents = require(ReplicatedStorage.RedEvents)

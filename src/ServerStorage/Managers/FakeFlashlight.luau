@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Pulls out A fake flashlight for other players to see.
+]]
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 

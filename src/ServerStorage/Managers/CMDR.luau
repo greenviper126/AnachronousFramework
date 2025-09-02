@@ -1,5 +1,9 @@
 --!strict
 
+--[[
+	Initialization for Server side of CMDR.
+]]
+
 local ServerStorage = game:GetService("ServerStorage")
 
 local Cmdr = require(ServerStorage.ServerPackages.cmdr)

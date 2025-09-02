@@ -1,9 +1,9 @@
 --!strict
 
 --[[
-    This should have a signal to send to body tracking so it gets camera CFrame without the bobbing
+	Server Logic for Vents.
 
-    may need some functions to stop camera bobbing on cutscenes
+	Since vents are very simple most code is on the Server.
 ]]
 
 ---------------------------------------------------------------------------------------

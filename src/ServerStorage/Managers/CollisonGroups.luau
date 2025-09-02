@@ -1,5 +1,11 @@
 --!strict
 
+--[[
+	All Collision Groups for the Game.
+
+	Needs to be in code so It Applies in New Places.
+]]
+
 local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 

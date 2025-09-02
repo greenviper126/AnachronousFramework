@@ -1,8 +1,7 @@
 --!strict
 
 --[[
-    Sets CFrame values onto payer so its not just local
-    Should be fine since player cannot see them self in game
+    Sets CFrame values onto payer so its not just local.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
