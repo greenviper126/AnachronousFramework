@@ -24,6 +24,8 @@ local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 local buttonActivated = RedEvents.NewSignal()
 
+local registeredClasses: { [string]: boolean } = {}
+
 export type HighlightPrompt = {
 	ClickablePrompt: boolean,
 	Enabled: boolean,
@@ -178,6 +180,10 @@ local function createPrompt(parent: Instance): HighlightPrompt
 			end
 
 			prevHit = hitResult
+
+			if results.ServerClass and not registeredClasses[results.ServerClass] then
+				registeredClasses[results.ServerClass] = true
+			end
 		end)
 
 		local function sendClassToServer()
@@ -262,6 +268,12 @@ ContextActionService:BindActionAtPriority(
 
 local HighlightPrompt = {}
 
+--[[
+	Adds Highlight Preset to HighlightPrompt.
+
+	@param prompt HighlightPrompt - Prompt to apply preset
+	@param preset "Neutral" | "Confirm" | "Deny" - name of the preset
+]]
 function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Neutral" | "Confirm" | "Deny")
 	local whiteAccent = GlobalInfo.COLOR_THEME.ACCENT.WHITE
 	local greenAccent = GlobalInfo.COLOR_THEME.ACCENT.GREEN
@@ -285,8 +297,24 @@ function HighlightPrompt.SetHighlightPreset(prompt: HighlightPrompt, preset: "Ne
 	end
 end
 
+--[[
+	Create a HighlightPrompt to use locally.
+
+	@param parent Instance - Instance to attach prompt
+
+	@return HighlightPrompt - the HighlightPrompt (fake)Instance
+]]
 function HighlightPrompt.Create(parent: Instance): HighlightPrompt
 	return createPrompt(parent)
+end
+
+--[[
+	Get all HighlightPrompt class names registered to the server.
+
+	@return { [string]: boolean } - classes table
+]]
+function HighlightPrompt.GetRegisteredClasses(): { [string]: boolean }
+	return registeredClasses
 end
 
 return HighlightPrompt
