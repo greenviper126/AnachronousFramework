@@ -1,7 +1,7 @@
 --!strict
 
 --[[
-	This is static information
+	This is static information that is used through out the game.
 ]]
 
 local GlobalInfo = {}
@@ -56,9 +56,9 @@ GlobalInfo.INFO_TEXT = {
 
 GlobalInfo.MOVEMENT = {
 	SPEED = { --character speed
-		WALKING = 8,
-		RUNNING = 16,
-		CROUCHING = 5,
+		WALKING = 8, --float
+		RUNNING = 16, --float
+		CROUCHING = 5, --float
 	},
 	TRACKING = { --body to camera tracking
 		LOOK_LERP_SPEED = 0.2, --float
